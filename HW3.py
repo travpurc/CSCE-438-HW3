@@ -1,4 +1,17 @@
-# Import
+'''
+Texas A&M University - Spring 2014 - CSCE 438
+HW3 - CrowdCaptioners
+
+CrowdCaptioners Team:
+Vishal Anand
+Travis Purcell
+Ricardo Zavala
+
+File Created by: Travis Purcell
+'''
+#-------------------------------
+# ----------- Import -----------
+#-------------------------------
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 import simplejson as json
@@ -6,9 +19,21 @@ import requests
 import urllib2
 import re
 
-# Get the youtube link
-YouTube_URL = raw_input("Youtube Link: ")
-#url = "http://www.youtube.com/watch?v=NMSe3f39Dhg"
+#-------------------------------
+#----------- YouTube -----------
+#-------------------------------
+
+#Test URL - Standard
+url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
+#Test URL - Compelex
+#url = "http://www.youtube.com/watch?v=b19l1y7h8XA&list=PLU3TaPgchJtS0U_Qd_bEB5GxAZ4C4_pId"
+#Test URL - IS NOT EMBEDDABLE and CAN'T BE KNOWN PRIOR TO ATTEMPTING TO PLAY THE VIDEO
+#TODO: Generate gdata.youtube.com link and make user manually check
+#url = "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Get the YouTube link from user
+#url = raw_input("Youtube Link: ")
+
 
 Video_ID = re.search( "v=(.*)&|v=(.*)", url)
 
@@ -32,23 +57,29 @@ except URLError as e:
 #Print the response
 #print data
 
-error = re.search( "yt:state name='([a-bA-B]*)'", data)
+data_title = re.search( "<title>(.*)</title>", data).group(1)
+print "Title: "+ data_title
+
+#Catchable errors on embedding the video...
+error = re.search( "yt:state name='([a-bA-B]*)'", data).group(1)
+print error
 if error != None:
-    if error.group(1) == "resricted" or error.group(1) == "rejected":
-        print "Error: Video "+ error.group(1) +" by YouTube, unable to generate caption..."
+    if error == "resricted" or error == "rejected":
+        print "Error: Video "+ error +" by YouTube, unable to generate caption..."
     else:
         print "Error: Video failed, unable to generate caption..."
 
-data_duration = re.search( "duration='([0-9]*)'", data)
-print "Duration: "+ data_duration.group(1)
-data_embeddable = re.search( "action='embed' permission='([a-z]*)'", data)
-print "Embeddable: "+ data_embeddable.group(1)
-if data_embeddable.group(1) != "allowed":
+
+data_duration = re.search( "duration='([0-9]*)'", data).group(1)
+print "Duration: "+ data_duration
+data_embeddable = re.search( "action='embed' permission='([a-z]*)'", data).group(1)
+print "Embeddable: "+ data_embeddable
+if data_embeddable != "allowed":
     print "Error: Video is not currently allowed to be embedded, unable to generate captions..."
 
-
-
-
+#-------------------------------
+#------------ MTURK ------------
+#-------------------------------
 '''
 ACCESS_ID = raw_input("ACCESS_ID: ")
 SECRET_KEY = raw_input("SECRET_KEY: ");
