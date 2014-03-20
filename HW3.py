@@ -111,6 +111,7 @@ HIT Data Structure
   <HITReviewStatus>NotReviewed</HITReviewStatus>
 </HIT>
 '''
+
 print new_hit[0].HITId
 print new_hit[0].HITTypeId
 
