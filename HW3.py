@@ -4,8 +4,8 @@
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 
-ACCESS_ID ='AKIAIMZSF4GBOL4QTGTA'
-SECRET_KEY = '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'
+ACCESS_ID = raw_input("ACCESS_ID: ")
+SECRET_KEY = raw_input("SECRET_KEY: ");
 HOST = 'mechanicalturk.sandbox.amazonaws.com'
 
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
@@ -111,7 +111,6 @@ HIT Data Structure
   <HITReviewStatus>NotReviewed</HITReviewStatus>
 </HIT>
 '''
-
 print new_hit[0].HITId
 print new_hit[0].HITTypeId
 
