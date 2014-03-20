@@ -1,9 +1,55 @@
-
-
 # Import
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
+import simplejson as json
+import requests
+import urllib2
+import re
 
+# Get the youtube link
+YouTube_URL = raw_input("Youtube Link: ")
+#url = "http://www.youtube.com/watch?v=NMSe3f39Dhg"
+
+Video_ID = re.search( "v=(.*)&|v=(.*)", url)
+
+if Video_ID.group(1) == None:
+    Video_Data = "https://gdata.youtube.com/feeds/api/videos/"+Video_ID.group(2)+"?v=2"
+else:
+    Video_Data = "https://gdata.youtube.com/feeds/api/videos/"+Video_ID.group(1)+"?v=2"
+
+#print Video_Data
+
+#Try to get a response from the provided url
+try:
+    data = (urllib2.urlopen(Video_Data)).read()
+except HTTPError as e:
+    print 'The server couldn\'t fulfill the request.'
+    print 'Error code: ', e.code
+except URLError as e:
+    print 'We failed to reach YouTube server.'
+    print 'Reason: ', e.reason
+
+#Print the response
+#print data
+
+error = re.search( "yt:state name='([a-bA-B]*)'", data)
+if error != None:
+    if error.group(1) == "resricted" or error.group(1) == "rejected":
+        print "Error: Video "+ error.group(1) +" by YouTube, unable to generate caption..."
+    else:
+        print "Error: Video failed, unable to generate caption..."
+
+data_duration = re.search( "duration='([0-9]*)'", data)
+print "Duration: "+ data_duration.group(1)
+data_embeddable = re.search( "action='embed' permission='([a-z]*)'", data)
+print "Embeddable: "+ data_embeddable.group(1)
+if data_embeddable.group(1) != "allowed":
+    print "Error: Video is not currently allowed to be embedded, unable to generate captions..."
+
+
+
+
+'''
 ACCESS_ID = raw_input("ACCESS_ID: ")
 SECRET_KEY = raw_input("SECRET_KEY: ");
 HOST = 'mechanicalturk.sandbox.amazonaws.com'
@@ -79,6 +125,8 @@ new_hit = mtc.create_hit(questions=question_form,
 
 
 '''
+
+'''
 HIT Data Structure
 
 <HIT>
@@ -110,36 +158,39 @@ HIT Data Structure
   </QualificationRequirement>
   <HITReviewStatus>NotReviewed</HITReviewStatus>
 </HIT>
-'''
+
 print new_hit[0].HITId
 print new_hit[0].HITTypeId
+'''
 
-#def get_all_reviewable_hits(mtc):
-#    page_size = 50
-#    hits = mtc.get_reviewable_hits(page_size=page_size)
-#    print "Total results to fetch %s " % hits.TotalNumResults
-#    print "Request hits page %i" % 1
-#    total_pages = float(hits.TotalNumResults)/page_size
-#    int_total= int(total_pages)
-#    if(total_pages-int_total>0):
-#        total_pages = int_total+1
-#    else:
-#        total_pages = int_total
-#    pn = 1
-#    while pn < total_pages:
-#        pn = pn + 1
-#        print "Request hits page %i" % pn
-#        temp_hits = mtc.get_reviewable_hits(page_size=page_size,page_number=pn)
-#        hits.extend(temp_hits)
-#    return hits
+'''
+def get_all_reviewable_hits(mtc):
+    page_size = 50
+    hits = mtc.get_reviewable_hits(page_size=page_size)
+    print "Total results to fetch %s " % hits.TotalNumResults
+    print "Request hits page %i" % 1
+    total_pages = float(hits.TotalNumResults)/page_size
+    int_total= int(total_pages)
+    if(total_pages-int_total>0):
+        total_pages = int_total+1
+    else:
+        total_pages = int_total
+    pn = 1
+    while pn < total_pages:
+        pn = pn + 1
+        print "Request hits page %i" % pn
+        temp_hits = mtc.get_reviewable_hits(page_size=page_size,page_number=pn)
+        hits.extend(temp_hits)
+    return hits
 
-#hits = get_all_reviewable_hits(mtc)
+hits = get_all_reviewable_hits(mtc)
  
-#for hit in hits:
-#    assignments = mtc.get_assignments(hit.HITId)
-#    for assignment in assignments:
-#        print "Answers of the worker %s" % assignment.WorkerId
-#        for question_form_answer in assignment.answers[0]:
-#            for key, value in question_form_answer.fields:
-#                print "%s: %s" % (key,value)
-#        print "--------------------"
+for hit in hits:
+    assignments = mtc.get_assignments(hit.HITId)
+    for assignment in assignments:
+        print "Answers of the worker %s" % assignment.WorkerId
+        for question_form_answer in assignment.answers[0]:
+            for key, value in question_form_answer.fields:
+                print "%s: %s" % (key,value)
+        print "--------------------"
+'''
