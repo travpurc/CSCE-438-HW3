@@ -12,6 +12,7 @@ File Created by: Travis Purcell
 #-------------------------------
 # ----------- Import -----------
 #-------------------------------
+
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 import simplejson as json
@@ -27,32 +28,41 @@ import re
 url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
 #Test URL - Compelex
 #url = "http://www.youtube.com/watch?v=b19l1y7h8XA&list=PLU3TaPgchJtS0U_Qd_bEB5GxAZ4C4_pId"
+#Test URL - Invalid
+url = "http://www.bob.com/watch?v=XXXXXXXXX"
 #Test URL - IS NOT EMBEDDABLE and CAN'T BE KNOWN PRIOR TO ATTEMPTING TO PLAY THE VIDEO
-#TODO: Generate gdata.youtube.com link and make user manually check
+#TODO: Generate embedded link and make user manually check first...
 #url = "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 # Get the YouTube link from user
 #url = raw_input("Youtube Link: ")
 
+try:
+    Video_ID = re.search( "v=(.*)&|v=(.*)", url)
+    if Video_ID.group(1) == None:
+        Video_ID = Video_ID.group(2)
+    else:
+        Video_ID = Video_ID.group(1)
+except:
+    print "Invalid Youtube Url"
+    quit(0)
 
-Video_ID = re.search( "v=(.*)&|v=(.*)", url)
 
-if Video_ID.group(1) == None:
-    Video_Data = "https://gdata.youtube.com/feeds/api/videos/"+Video_ID.group(2)+"?v=2"
-else:
-    Video_Data = "https://gdata.youtube.com/feeds/api/videos/"+Video_ID.group(1)+"?v=2"
+Video_Data = "https://gdata.youtube.com/feeds/api/videos/"+Video_ID+"?v=2"
 
 #print Video_Data
 
 #Try to get a response from the provided url
 try:
     data = (urllib2.urlopen(Video_Data)).read()
-except HTTPError as e:
+except urllib2.HTTPError as e:
     print 'The server couldn\'t fulfill the request.'
-    print 'Error code: ', e.code
-except URLError as e:
+    print 'HTTP Error code: ', e.code
+    quit(0)
+except urllib2.URLError as e:
     print 'We failed to reach YouTube server.'
     print 'Reason: ', e.reason
+    quit(0)
 
 #Print the response
 #print data
@@ -61,14 +71,14 @@ data_title = re.search( "<title>(.*)</title>", data).group(1)
 print "Title: "+ data_title
 
 #Catchable errors on embedding the video...
-error = re.search( "yt:state name='([a-bA-B]*)'", data).group(1)
+error = re.search( "yt:state name='([a-bA-B]*)'", data)
 print error
 if error != None:
-    if error == "resricted" or error == "rejected":
-        print "Error: Video "+ error +" by YouTube, unable to generate caption..."
+    if error.group(1) == "resricted" or error.group(1) == "rejected":
+        print "Error: Video "+ error.group(1) +" by YouTube, unable to generate caption..."
     else:
         print "Error: Video failed, unable to generate caption..."
-
+    quit(0)
 
 data_duration = re.search( "duration='([0-9]*)'", data).group(1)
 print "Duration: "+ data_duration
@@ -76,6 +86,31 @@ data_embeddable = re.search( "action='embed' permission='([a-z]*)'", data).group
 print "Embeddable: "+ data_embeddable
 if data_embeddable != "allowed":
     print "Error: Video is not currently allowed to be embedded, unable to generate captions..."
+    quit(0)
+
+#-------------------------------
+#-------- Embedded Video -------
+#-------------------------------
+
+seconds = 0                         #duration of embedded video - last segment is just remaining time of originak video
+embedded_video_length = 20;         #embedded video length is n+1 watch time
+total_time = int(data_duration)     #duration of original video
+count = 0                           #number of video segments  
+video_start = []                    #arrays of the sequential start and end times
+video_end = []
+while (seconds < total_time):       #Build the start and end arrays
+     video_start.append(seconds)
+     seconds+=embedded_video_length-1
+     video_end.append(seconds)
+     count+=1
+     seconds+=1
+
+#Build Embedded URL list
+embedded_url = []
+for i in range(0,count):
+    embedded_url.append("http://www.youtube.com/embed/"+Video_ID+"?autoplay=1&modestbranding=1&iv_load_policy=3&showinfo=0&rel=0&start="+str(video_start[i])+"&end="+str(video_end[i]))
+
+print embedded_url
 
 #-------------------------------
 #------------ MTURK ------------
