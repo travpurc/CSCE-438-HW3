@@ -19,6 +19,7 @@ import simplejson as json
 import requests
 import urllib2
 import re
+import time
 
 #-------------------------------
 #----------- YouTube -----------
@@ -125,7 +126,14 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
                       host=HOST)
 
+#TODO: Remove?
 print mtc.get_account_balance() 
+
+#TODO: Remove - DELETES ALL USER HITS (Resets for testing...)
+Reset = mtc.get_all_hits()
+for hit in Reset:
+    mtc.disable_hit(hit.HITId)
+    print hit.HITId + " - Disabled"
 
 #-------------------------------
 #-------- HIT Generation -------
@@ -188,7 +196,7 @@ for i in range(0, count):
     #--------------- CREATE THE HIT -------------------
  
     new_hit = mtc.create_hit(questions=question_form,
-                   max_assignments=3,
+                   max_assignments=1, #TODO: Make it 3, but impossible to test alone above 1
                    title=title,
                    description=description,
                    keywords=keywords,
@@ -197,10 +205,10 @@ for i in range(0, count):
     
     
     print new_hit[0].HITId
-    print new_hit[0].HITTypeId
-    HIT_IDs.append(new_hit[0].HITTypeId)
-    #print "https://workersandbox.mturk.com/mturk/preview?groupId="+new_hit[0].HITTypeId
+    #print new_hit[0].HITTypeId
+    print "https://workersandbox.mturk.com/mturk/preview?groupId="+new_hit[0].HITTypeId
 
+    HIT_IDs.append(new_hit[0].HITId)
     i+=1
     #End of loop
 
@@ -208,8 +216,8 @@ for i in range(0, count):
 HIT Data Structure
 
 <HIT>
-  <HITId>123RVWYBAZW00EXAMPLE</HITId>          - ID of Hit in HIT group
-  <HITTypeId>T100CN9P324W00EXAMPLE</HITTypeId> - The True HIT ID
+  <HITId>123RVWYBAZW00EXAMPLE</HITId>          - ID of Hit
+  <HITTypeId>T100CN9P324W00EXAMPLE</HITTypeId> - The Website Link ID
   <CreationTime>2005-06-30T23:59:59</CreationTime>
   <HITStatus>Assignable</HITStatus>
   <MaxAssignments>5</MaxAssignments>
@@ -242,11 +250,12 @@ HIT Data Structure
 #-------- Gather Results -------
 #-------------------------------
 
+#Get all HITs that have all assignments completed
 def get_all_reviewable_hits(mtc):
     page_size = 50
     hits = mtc.get_reviewable_hits(page_size=page_size)
     print "Total results to fetch %s " % hits.TotalNumResults
-    print "Request hits page %i" % 1
+    #print "Request hits page %i" % 1
     total_pages = float(hits.TotalNumResults)/page_size
     int_total= int(total_pages)
     if(total_pages-int_total>0):
@@ -265,18 +274,31 @@ def get_all_reviewable_hits(mtc):
 #--------- Holding Loop --------
 #-------------------------------
 
-
+Completed_HITs = []
 while count > 0:
     hits = []
     while hits == []:
         hits = get_all_reviewable_hits(mtc)
-        print hits
-    print "---------------- OUT OF WHILE LOOP -----------------------"
+        #Wait for a bit...
+        if hits == []:
+            time.sleep(30)
+        #print hits
+    print "---------------- HIT(s) Reviewable -----------------------"
+    
+    #Design Notes:
+    #So.... A hit has had all it's assignments completed... but I can't see multiple assignments myself because I can't do them all... 
+    #so I have to guess how to get assignment data is organized and how to put it back in the correct order after verification...
+    #....
+    #assignment in assignments values into list, compare items in list (same = good), develope new HIT for validation,
+    #tie new validation HIT to old video segment HIT
+    #pay workers based on some security question and some form of valid entry in text field - OR - security questions and validation results
+    #loop as needed
+
     for hit in hits:
         print hit.HITId
         assignments = mtc.get_assignments(hit.HITId)
         for assignment in assignments:
-            print "Answers of the worker %s" % assignment.WorkerId
+            print "Answers of the worker %s \n In assignment: %s \n Of HIT: %s" % assignment.WorkerId, assignment.AssignmentId, hit.HITId
             for question_form_answer in assignment.answers[0]:
                 try:
                     for key, value in question_form_answer.fields:
@@ -285,9 +307,10 @@ while count > 0:
                     for value in question_form_answer.fields:
                         print value
             mtc.approve_assignment(assignment.AssignmentId)
-            print "--------------------"
+            print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
             mtc.disable_hit(hit.HITId)
-            count-=1 #Got the result from a hit
+            Completed_HITs.append(hit.HITId)
+            count-=1 #Got the result from a video segment HIT
     
-print "---------------- OUT OF WHILE LOOP -----------------------"
-
+print "---------------- NO MORE HITS TO FIND -----------------------"
+print Completed_HITs
