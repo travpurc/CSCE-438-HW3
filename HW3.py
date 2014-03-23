@@ -14,12 +14,33 @@ File Created by: Travis Purcell
 #-------------------------------
 
 from boto.mturk.connection import MTurkConnection
-from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 import simplejson as json
 import requests
 import urllib2
 import re
 import time
+import HITGeneration
+
+#-------------------------------
+#-------- Config Globals -------
+#-------------------------------
+
+#TODO: Need to find them in the file again...
+
+seconds = 0                         #duration of embedded video - last segment is just remaining time of original video
+embedded_video_length = 20;         #embedded video length is n+1 watch time
+video_start = []                    #arrays of the sequential start and end times
+video_end = []
+validationHurdle = 0.95             #Requires that answers be this similar [0,1] to be considered the same
+
+#TODO: Make it 3, but impossible to test alone above 1
+assignmentNum = 1                   #Number of times the videos will be captioned
+
+#-------------------------------
+#------- Regular Globals -------
+#-------------------------------
+
+count = 0                           #number of video segments (aka HITs)
 
 #-------------------------------
 #----------- YouTube -----------
@@ -93,12 +114,7 @@ if data_embeddable != "allowed":
 #-------- Embedded Video -------
 #-------------------------------
 
-seconds = 0                         #duration of embedded video - last segment is just remaining time of originak video
-embedded_video_length = 20;         #embedded video length is n+1 watch time
 total_time = int(data_duration)     #duration of original video
-count = 0                           #number of video segments (aka HITs)
-video_start = []                    #arrays of the sequential start and end times
-video_end = []
 while (seconds < total_time):       #Build the start and end arrays
      video_start.append(seconds)
      seconds+=embedded_video_length-1
@@ -139,112 +155,7 @@ for hit in Reset:
 #-------- HIT Generation -------
 #-------------------------------
 
-HIT_IDs = []
-for i in range(0, count):
-    title = 'Give your opinion about a website'
-    description = ('Visit a website and give us your opinion about'
-                   ' the design and also some personal comments')
-    keywords = 'website, rating, opinions'
- 
-    ratings =[('Very Bad','-2'),
-             ('Bad','-1'),
-             ('Not bad','0'),
-             ('Good','1'),
-             ('Very Good','1')]
- 
-    #---------------  BUILD OVERVIEW -------------------
- 
-    overview = Overview()
-    overview.append_field('Title', 'Give your opinion on this website')
-    overview.append(FormattedContent('<a target="_blank"'
-                                     ' href="http://www.toforge.com">'
-                                     ' Mauro Rocco Personal Forge</a>'))
- 
-    #---------------  BUILD QUESTION 1 -------------------
- 
-    qc1 = QuestionContent()
-    qc1.append_field('Title','How looks the design ?')
- 
-    fta1 = SelectionAnswer(min=1, max=1,style='dropdown',
-                          selections=ratings,
-                          type='text',
-                          other=False)
- 
-    q1 = Question(identifier='design',
-                  content=qc1,
-                  answer_spec=AnswerSpecification(fta1),
-                  is_required=True)
- 
-    #---------------  BUILD QUESTION 2 -------------------
- 
-    qc2 = QuestionContent()
-    qc2.append_field('Title','Your personal comments')
- 
-    fta2 = FreeTextAnswer()
- 
-    q2 = Question(identifier="comments",
-                  content=qc2,
-                  answer_spec=AnswerSpecification(fta2))
- 
-    #--------------- BUILD THE QUESTION FORM -------------------
- 
-    question_form = QuestionForm()
-    question_form.append(overview)
-    question_form.append(q1)
-    question_form.append(q2)
- 
-    #--------------- CREATE THE HIT -------------------
- 
-    new_hit = mtc.create_hit(questions=question_form,
-                   max_assignments=1, #TODO: Make it 3, but impossible to test alone above 1
-                   title=title,
-                   description=description,
-                   keywords=keywords,
-                   duration = 60*2,
-                   reward=0.05)
-    
-    
-    print new_hit[0].HITId
-    #print new_hit[0].HITTypeId
-    print "https://workersandbox.mturk.com/mturk/preview?groupId="+new_hit[0].HITTypeId
-
-    HIT_IDs.append(new_hit[0].HITId)
-    i+=1
-    #End of loop
-
-'''
-HIT Data Structure
-
-<HIT>
-  <HITId>123RVWYBAZW00EXAMPLE</HITId>          - ID of Hit
-  <HITTypeId>T100CN9P324W00EXAMPLE</HITTypeId> - The Website Link ID
-  <CreationTime>2005-06-30T23:59:59</CreationTime>
-  <HITStatus>Assignable</HITStatus>
-  <MaxAssignments>5</MaxAssignments>
-  <AutoApprovalDelayInSeconds>86400</AutoApprovalDelayInSeconds>
-  <LifetimeInSeconds>86400</LifetimeInSeconds>
-  <AssignmentDurationInSeconds>300</AssignmentDurationInSeconds>
-  <Reward>
-    <Amount>25</Amount>
-    <CurrencyCode>USD</CurrencyCode>
-    <FormattedPrice>$0.25</FormattedPrice>
-  </Reward>
-  <Title>Location and Photograph Identification</Title>
-  <Description>Select the image that best represents...</Description>
-  <Keywords>location, photograph, image, identification, opinion</Keywords>
-  <Question>
-    &lt;QuestionForm&gt;
-      [XML-encoded Question data]
-    &lt;/QuestionForm&gt;
-  </Question>
-  <QualificationRequirement>
-    <QualificationTypeId>789RVWYBAZW00EXAMPLE</QualificationTypeId>
-    <Comparator>GreaterThan</Comparator>
-    <Value>18</Value>
-  </QualificationRequirement>
-  <HITReviewStatus>NotReviewed</HITReviewStatus>
-</HIT>
-'''
+HIT_IDs = HITGeneration.GenerateCaptionHIT(mtc, count, assignmentNum)
 
 #-------------------------------
 #-------- Gather Results -------
@@ -276,6 +187,7 @@ def get_all_reviewable_hits(mtc):
 
 Completed_HITs = []
 while count > 0:
+    
     hits = []
     while hits == []:
         hits = get_all_reviewable_hits(mtc)
@@ -295,17 +207,39 @@ while count > 0:
     #loop as needed
 
     for hit in hits:
+        HIT_Answers = []
         print hit.HITId
         assignments = mtc.get_assignments(hit.HITId)
         for assignment in assignments:
-            print "Answers of the worker %s \n In assignment: %s \n Of HIT: %s" % assignment.WorkerId, assignment.AssignmentId, hit.HITId
+            print "Worker ID:"+assignment.WorkerId+"\nAssignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
             for question_form_answer in assignment.answers[0]:
                 try:
                     for key, value in question_form_answer.fields:
+                        HIT_Answers.append(value)
                         print "%s - %s" % (key,value)
                 except:
                     for value in question_form_answer.fields:
+                        HIT_Answers.append(value)
                         print value
+
+            #Checking for Similarity
+            #TODO: Move into function?
+            similarity = 0
+            perfectAnswers = False
+            if assignmentNum > 1:
+                for a1 in HIT_Answers:
+                    if HIT_Answers.count(a1) == assignmentNum:
+                        print "!!! Total Validation !!!"
+                        perfectAnswers = true
+                        break;
+                    for a2 in HIT_Answers:
+                        if similar(a1, a2, validationHurdle):
+                            similarity += validationHurdle;
+
+                if not perfectAnswers and (similarity/assignmentNum) > validationHurdle: 
+                    #TODO: Fix - PLACEHOLDER
+                    print "accept without any validation"
+
             mtc.approve_assignment(assignment.AssignmentId)
             print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
             mtc.disable_hit(hit.HITId)
