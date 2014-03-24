@@ -130,8 +130,8 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
         #End of loop
     return HIT_IDs
 
-#Generates a validation HIT, Takes a Caption HIT ID and returns a validation HIT ID
-def GenerateValidationHIT(mtc):
+#Generates a validation HIT, Takes a Caption HIT ID, a list of possible answers and returns a validation HIT ID
+def GenerateValidationHIT(mtc, PossibleAnswers):
     HIT_ID
     title = 'Give your opinion about a website'
     description = ('Visit a website and give us your opinion about'

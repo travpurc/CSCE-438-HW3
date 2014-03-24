@@ -35,6 +35,7 @@ validationHurdle = 0.95             #Requires that answers be this similar [0,1]
 
 #TODO: Make it 3, but impossible to test alone above 1
 assignmentNum = 1                   #Number of times the videos will be captioned
+validationNum = 1                   #Number of times the Caption HITs will validated
 
 #-------------------------------
 #------- Regular Globals -------
@@ -185,15 +186,14 @@ def get_all_reviewable_hits(mtc):
 #--------- Holding Loop --------
 #-------------------------------
 
-Completed_HITs = []
+Completed_HITs = []         #Used to link caption and validation HITs
+Validation_HIT_Count = 0    #Number of validation hits generated
 while count > 0:
-    
     hits = []
     while hits == []:
         hits = get_all_reviewable_hits(mtc)
-        #Wait for a bit...
         if hits == []:
-            time.sleep(30)
+            time.sleep(30)  #Wait for a bit...
         #print hits
     print "---------------- HIT(s) Reviewable -----------------------"
     
@@ -201,7 +201,7 @@ while count > 0:
     #So.... A hit has had all it's assignments completed... but I can't see multiple assignments myself because I can't do them all... 
     #so I have to guess how to get assignment data is organized and how to put it back in the correct order after verification...
     #....
-    #assignment in assignments values into list, compare items in list (same = good), develope new HIT for validation,
+    #assignment in assignments values into list, compare items in list (same or similar = good), develope new HIT for validation,
     #tie new validation HIT to old video segment HIT
     #pay workers based on some security question and some form of valid entry in text field - OR - security questions and validation results
     #loop as needed
@@ -222,29 +222,105 @@ while count > 0:
                         HIT_Answers.append(value)
                         print value
 
-            #Checking for Similarity
-            #TODO: Move into function?
+            #-------------------------------
+            #------- Similarity Check ------
+            #-------------------------------
             similarity = 0
             perfectAnswers = False
-            if assignmentNum > 1:
-                for a1 in HIT_Answers:
-                    if HIT_Answers.count(a1) == assignmentNum:
-                        print "!!! Total Validation !!!"
-                        perfectAnswers = true
-                        break;
-                    for a2 in HIT_Answers:
-                        if similar(a1, a2, validationHurdle):
-                            similarity += validationHurdle;
+            perfectAnswer = ""
+            #if assignmentNum > 1:
+            for a1 in HIT_Answers:
+                #Check if all answers match
+                if HIT_Answers.count(a1) == assignmentNum:
+                    print "--- !!! Total Validation !!! ---"
+                    perfectAnswers = true
+                    perfectAnswer = a1
+                    break
+                #Otherwise, check how similar the answers
+                for a2 in HIT_Answers:
+                    if similar(a1, a2, validationHurdle):
+                        similarity += validationHurdle;
+            #If the responses are the same or they are similar enough then accept the 1st response
+            if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
+                print "Accept without any validation HIT"
+                print "Accept First Answer (since they are so similar)"
+                mtc.approve_assignment(assignment.AssignmentId)
+                Completed_HITs.append((hit.HITId, perfectAnswer))
+                mtc.disable_hit(hit.HITId)
+            else:
+                HITId_and_ValidationID = (hit.HITId, GenerateValidationHIT(mtc, HIT_Answers))
+                Validation_HIT_Count += 1
+                Completed_HITs.append(HITId_and_ValidationID)
 
-                if not perfectAnswers and (similarity/assignmentNum) > validationHurdle: 
-                    #TODO: Fix - PLACEHOLDER
-                    print "accept without any validation"
-
-            mtc.approve_assignment(assignment.AssignmentId)
             print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+            count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             mtc.disable_hit(hit.HITId)
-            Completed_HITs.append(hit.HITId)
-            count-=1 #Got the result from a video segment HIT
-    
-print "---------------- NO MORE HITS TO FIND -----------------------"
+
+print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
 print Completed_HITs
+
+#-------------------------------
+#--- Validation Holding Loop ---
+#-------------------------------
+
+'''
+#By this time all validation HITs have been generated (if any)
+while Validation_HIT_Count > 0:
+    validation_hits = []
+    while validation_hits == []:
+        validation_hits = get_all_reviewable_hits(mtc)
+        if validation_hits == []:
+            time.sleep(30)  #Wait for a bit...
+        #print hits
+    print "----------- Validation HIT(s) Reviewable ------------------"
+
+    for hit in validation_hits:
+        HIT_Answers = []
+        print hit.HITId
+        assignments = mtc.get_assignments(hit.HITId)
+        for assignment in assignments:
+            print "Worker ID:"+assignment.WorkerId+"\nValidation Assignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
+            for question_form_answer in assignment.answers[0]:
+                try:
+                    for key, value in question_form_answer.fields:
+                        HIT_Answers.append(value)
+                        print "%s - %s" % (key,value)
+                except:
+                    for value in question_form_answer.fields:
+                        HIT_Answers.append(value)
+                        print value
+
+            #-------------------------------
+            #------- Similarity Check ------
+            #-------------------------------
+            similarity = 0
+            perfectAnswers = False
+            perfectAnswer = ""
+            #if validationNum > 1:
+            for a1 in HIT_Answers:
+                #Check if all answers match
+                if HIT_Answers.count(a1) == assignmentNum:
+                    print "--- !!! Total Validation !!! ---"
+                    perfectAnswers = true
+                    perfectAnswer = a1
+                    break
+                #Otherwise, check how similar the answers
+                for a2 in HIT_Answers:
+                    if similar(a1, a2, validationHurdle):
+                        similarity += validationHurdle;
+            #If the responses are the same or they are similar enough then accept the 1st response
+            if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
+                print "Accept without any validation HIT"
+                print "Accept First Answer (since they are so similar)"
+                mtc.approve_assignment(assignment.AssignmentId)
+                Completed_HITs.append((hit.HITId, perfectAnswer))
+                mtc.disable_hit(hit.HITId)
+            else:
+                HITId_and_ValidationID = (hit.HITId, GenerateValidationHIT(mtc, HIT_Answers))
+                Validation_HIT_Count += 1
+                Completed_HITs.append(HITId_and_ValidationID)
+
+            print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+            Validation_HIT_Count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
+            mtc.disable_hit(hit.HITId)
+'''
