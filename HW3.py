@@ -124,12 +124,12 @@ while (seconds < total_time):       #Build the start and end arrays
      seconds+=1
 
 #Build Embedded URL list
-embedded_url = []
+embedded_urls = []
 for i in range(0,count):
-    embedded_url.append("http://www.youtube.com/embed/"+Video_ID+"?autoplay=1&modestbranding=1&iv_load_policy=3&showinfo=0&rel=0&start="+str(video_start[i])+"&end="+str(video_end[i]))
+    embedded_urls.append("http://www.youtube.com/embed/"+Video_ID+"?autoplay=1&amp;modestbranding=1&amp;iv_load_policy=3&amp;showinfo=0&amp;rel=0&amp;start="+str(video_start[i])+"&amp;end="+str(video_end[i]))
 
-print embedded_url
-count = len(embedded_url)
+print embedded_urls
+count = len(embedded_urls)
 
 #-------------------------------
 #-------- AWS Connection -------
@@ -156,7 +156,7 @@ for hit in Reset:
 #-------- HIT Generation -------
 #-------------------------------
 
-HIT_IDs = HITGeneration.GenerateCaptionHIT(mtc, count, assignmentNum)
+HIT_IDs = HITGeneration.GenerateCaptionHIT(mtc, count, assignmentNum, embedded_urls)
 
 #-------------------------------
 #-------- Gather Results -------
@@ -208,7 +208,6 @@ while count > 0:
 
     for hit in hits:
         HIT_Answers = []
-        print hit.HITId
         assignments = mtc.get_assignments(hit.HITId)
         for assignment in assignments:
             print "Worker ID:"+assignment.WorkerId+"\nAssignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
@@ -231,30 +230,33 @@ while count > 0:
             #if assignmentNum > 1:
             for a1 in HIT_Answers:
                 #Check if all answers match
+                print HIT_Answers
                 if HIT_Answers.count(a1) == assignmentNum:
+                    print "Count of a1: " + str(HIT_Answers.count(a1))
                     print "--- !!! Total Validation !!! ---"
-                    perfectAnswers = true
+                    perfectAnswers = True
                     perfectAnswer = a1
                     break
                 #Otherwise, check how similar the answers
                 for a2 in HIT_Answers:
-                    if similar(a1, a2, validationHurdle):
+                    if HITGeneration.similar(a1, a2, validationHurdle):
                         similarity += validationHurdle;
             #If the responses are the same or they are similar enough then accept the 1st response
             if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
-                print "Accept without any validation HIT"
-                print "Accept First Answer (since they are so similar)"
+                print "Passed Validation Hurdle... No Validation HIT generated..."
                 mtc.approve_assignment(assignment.AssignmentId)
-                Completed_HITs.append((hit.HITId, perfectAnswer))
+                Completed_HITs.append((hit.HITId, "NONE"))
                 mtc.disable_hit(hit.HITId)
             else:
-                HITId_and_ValidationID = (hit.HITId, GenerateValidationHIT(mtc, HIT_Answers))
+                embedded_url = embedded_urls[HIT_IDs.index(hit.HITId)]
+                ValidationID = HITGeneration.GenerateValidationHIT(mtc, HIT_Answers, embedded_url)
+                HITId_and_ValidationID = (hit.HITId, ValidationID)
                 Validation_HIT_Count += 1
                 Completed_HITs.append(HITId_and_ValidationID)
-
+                mtc.disable_hit(hit.HITId)
             print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
-            mtc.disable_hit(hit.HITId)
+            
 
 print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
 print Completed_HITs

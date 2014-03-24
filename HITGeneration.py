@@ -47,7 +47,7 @@ HIT Data Structure (returned by create_hit)
 # ----------- Import -----------
 #-------------------------------
 
-from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
+from boto.mturk.question import QuestionContent,Question,HTMLQuestion,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 import difflib
 
 #-------------------------------
@@ -55,7 +55,7 @@ import difflib
 #-------------------------------
 
 #Generates N HITs, Returns a list of HIT IDs
-def GenerateCaptionHIT(mtc, n, assignmentNum):
+def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
     HIT_IDs = []
     for i in range(0, n):
         title = 'Give your opinion about a website'
@@ -67,7 +67,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
                  ('Bad','-1'),
                  ('Not bad','0'),
                  ('Good','1'),
-                 ('Very Good','1')]
+                 ('Very Good','2')]
  
         #---------------  BUILD OVERVIEW -------------------
  
@@ -75,7 +75,8 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
         overview.append_field('Title', 'Give your opinion on this website')
         overview.append(FormattedContent('<a target="_blank"'
                                          ' href="http://www.toforge.com">'
-                                         ' Mauro Rocco Personal Forge</a>'))
+                                         ' Mauro Rocco Personal Forge</a>'
+                                         ))
  
         #---------------  BUILD QUESTION 1 -------------------
  
@@ -86,7 +87,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
                               selections=ratings,
                               type='text',
                               other=False)
- 
+        #q1 = HTMLQuestion('<iframe id="ytplayer" type="text/html" width="640" height="360" src="'+embedded_urls[i]+'" frameborder="0" allowfullscreen>', 700)
         q1 = Question(identifier='design',
                       content=qc1,
                       answer_spec=AnswerSpecification(fta1),
@@ -112,6 +113,10 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
  
         #--------------- CREATE THE HIT -------------------
  
+        #Pretty sure we are going to have to link out to a video...
+        #hitContent = '<!DOCTYPE html> <html lang=en><head><meta charset=utf-8><title>Hello World</title></head><body><h1>VIdeo</h1><p>Just testing....</p></body></html>'
+        #html_question = HTMLQuestion(hitContent, 500)
+
         new_hit = mtc.create_hit(questions=question_form,
                        max_assignments=assignmentNum,
                        title=title,
@@ -131,7 +136,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum):
     return HIT_IDs
 
 #Generates a validation HIT, Takes a Caption HIT ID, a list of possible answers and returns a validation HIT ID
-def GenerateValidationHIT(mtc, PossibleAnswers):
+def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     HIT_ID
     title = 'Give your opinion about a website'
     description = ('Visit a website and give us your opinion about'
@@ -142,7 +147,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers):
                 ('Bad','-1'),
                 ('Not bad','0'),
                 ('Good','1'),
-                ('Very Good','1')]
+                ('Very Good','2')]
  
     #--------------- BUILD OVERVIEW -------------------
  
