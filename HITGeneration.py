@@ -48,7 +48,6 @@ HIT Data Structure (returned by create_hit)
 #-------------------------------
 
 from boto.mturk.question import QuestionContent,Question,HTMLQuestion,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
-import difflib
 
 #-------------------------------
 # --------- Functions ----------
@@ -207,7 +206,3 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
 
     return new_hit[0].HITId
 
-#Evaluates similarity of two strings and returns a bool
-def similar(string1, string2, hurdle):
-    areSimilar = hurdle #Hurdle value to determine similarity
-    return difflib.SequenceMatcher(a=seq1.lower(), b=seq2.lower()).ratio() > areSimilar
