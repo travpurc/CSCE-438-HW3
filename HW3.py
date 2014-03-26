@@ -29,14 +29,14 @@ import CaptionAndValidate
 #-------- Config Globals -------
 #-------------------------------
 
-#TODO: Need to find them in the file again...
-
-seconds = 0                         #Duration of embedded video - last segment is just remaining time of original video
+#TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
 embedded_video_length = 20;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 
-#TODO: Make it 3, but impossible to test alone above 1
+#Payment - Check HITGeneration.py config global
+
+#TODO: Make assignmentNum 3, but impossible to test alone above 1
 assignmentNum = 1                   #Number of times the videos will be captioned
 validationNum = 1                   #Number of times the Caption HITs will validated
 
@@ -44,6 +44,7 @@ validationNum = 1                   #Number of times the Caption HITs will valid
 #------- Regular Globals -------
 #-------------------------------
 
+seconds = 0                         #Duration of embedded video - last segment is just remaining time of original video
 count = 0                           #number of video segments (aka HITs)
 
 #-------------------------------
@@ -118,13 +119,26 @@ if data_embeddable != "allowed":
 #-------- Embedded Video -------
 #-------------------------------
 
-total_time = int(data_duration)     #duration of original video
+#total_time = int(data_duration)     #duration of original video
+total_time = 60
 while (seconds < total_time):       #Build the start and end arrays
      video_start.append(seconds)
      seconds+=embedded_video_length-1
-     video_end.append(seconds)
+     if seconds+1 < total_time and seconds < total_time:
+        video_end.append(seconds)
+     else:
+        video_end.append(seconds+1)
      count+=1
      seconds+=1
+
+time_left = total_time-(embedded_video_length*int(total_time/embedded_video_length))
+print time_left
+if time_left < embedded_video_length and time_left > 0:
+    start = video_start.pop()
+    print start
+    video_start.append(start)
+    video_end.pop()
+    video_end.append(start + time_left)
 
 #Build Embedded URL list
 embedded_urls = []
@@ -140,6 +154,7 @@ count = len(embedded_urls)
 
 ACCESS_ID = raw_input("ACCESS_ID: ")
 SECRET_KEY = raw_input("SECRET_KEY: ");
+#TODO: Change from sandbox when live
 HOST = 'mechanicalturk.sandbox.amazonaws.com'
 
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
@@ -149,7 +164,7 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 #TODO: Remove?
 print mtc.get_account_balance() 
 
-#TODO: Remove - DELETES ALL USER HITS (Resets for testing...)
+#TODO: Remove? - DELETES ALL PREVIOUS USER HITS (Resets for testing...)
 Reset = mtc.get_all_hits()
 for hit in Reset:
     mtc.disable_hit(hit.HITId)
@@ -167,5 +182,11 @@ Accepted_Answers = []       #Used to build the SRT File
 
 CaptionAndValidate.CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
 
+print "Completed Hits: " 
+print Completed_HITs
+print "Accepted Answers: "
+print Accepted_Answers
 
+SRTGenerator.GenerateSRT(data_title, total_time, embedded_video_length, video_start, video_end, Completed_HITs, Accepted_Answers)
 
+print "//////////////////// COMPLETED \\\\\\\\\\\\\\\\\\\\"

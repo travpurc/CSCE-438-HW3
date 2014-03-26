@@ -50,6 +50,15 @@ HIT Data Structure (returned by create_hit)
 from boto.mturk.question import QuestionContent,Question,HTMLQuestion,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
 
 #-------------------------------
+#-------- Config Globals -------
+#-------------------------------
+
+#Total Price  = ((Caption_Price * assignmentNum) + Validtion_Price)(video segments) + Tax
+#Choose Wisely...
+Caption_Price = 0.05
+Validtion_Price = 0.02
+
+#-------------------------------
 # --------- Functions ----------
 #-------------------------------
 
@@ -107,7 +116,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
  
         question_form = QuestionForm()
         question_form.append(overview)
-        question_form.append(q1)
+        #question_form.append(q1)
         question_form.append(q2)
  
         #--------------- CREATE THE HIT -------------------
@@ -122,7 +131,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
                        description=description,
                        keywords=keywords,
                        duration = 60*2,
-                       reward=0.05)
+                       reward = Caption_Price)
     
     
         print new_hit[0].HITId
@@ -186,7 +195,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
  
     question_form = QuestionForm()
     question_form.append(overview)
-    question_form.append(q1)
+    #question_form.append(q1)
     question_form.append(q2)
  
     #--------------- CREATE THE HIT -------------------
@@ -197,7 +206,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
                     description=description,
                     keywords=keywords,
                     duration = 60 * 2,
-                    reward=0.05)
+                    reward = Validtion_Price)
     
     
     print new_hit[0].HITId

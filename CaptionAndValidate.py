@@ -61,6 +61,9 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #-------------------------------
     #--------- Holding Loop --------
     #-------------------------------
+    
+    Validation_HIT_Count = 0    #Number of validation hits generated
+
     while count > 0:
         hits = []
         while hits == []:
@@ -120,9 +123,10 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                     print "Passed Validation Hurdle... No Validation HIT generated..."
                     mtc.approve_assignment(assignment.AssignmentId)
                     Completed_HITs.append((hit.HITId, "NONE"))
+                    Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
                     mtc.disable_hit(hit.HITId)
                 else:
-                    #TODO: If the captions are out of order check here...
+                    #TODO: If the captions are not similar enough
                     embedded_url = embedded_urls[HIT_IDs.index(hit.HITId)]
                     ValidationID = HITGeneration.GenerateValidationHIT(mtc, HIT_Answers, embedded_url)
                     HITId_and_ValidationID = (hit.HITId, ValidationID)
@@ -141,7 +145,6 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #-------------------------------
     #By this time all validation HITs have been generated (if any)
     RedoCationHITs = []
-    Validation_HIT_Count = 0    #Number of validation hits generated
 
     while Validation_HIT_Count > 0:
         validation_hits = []
@@ -168,23 +171,26 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                             HIT_Answers.append(value)
                             print value
 
-                #TODO: Modify if HIT_Answers[0] based on the desgin implementation (int, str, etc...)
+                #TODO: Modify HIT_Answers[0] based on the desgin implementation (int, str, etc... as well as indicies)... 
+                #Do a search/replace to be sure
                 #Check if the answer is the "None of the above" choice
                 if HIT_Answers[0] == "None of the Above":
-                    #Needs to be redone...
-                    HITId = (hit.HITId, HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, embedded_urls))[0]
+                    HITId = HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, embedded_urls)[0]
                     RedoCationHITs.append(HITId)
-                    Validation_HIT_Count -= 1
-                    Completed_HITs.append(HITId_and_ValidationID)
+                    mtc.approve_assignment(assignment.AssignmentId)
+
+                    #Remove the assignment from completed list since it failed and has to be recreated
+                    removing = [i for i, v in enumerate(Completed_HITs) if v[0] == hit.HITId]
+                    Completed_HITs.pop(removing[0])
+
                 else:
                     Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
                     mtc.approve_assignment(assignment.AssignmentId)
-                    Completed_HITs.append((hit.HITId, perfectAnswer))
-                    mtc.disable_hit(hit.HITId)
-                    Validation_HIT_Count -= 1
 
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-                Validation_HIT_Count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
-                mtc.disable_hit(hit.HITId)
+                Validation_HIT_Count -= 1   #Got the result from a video segment HIT (regardless of validation it happened)
+                mtc.disable_hit(hit.HITId)  #Disable hit regardless
+
         if not len(RedoCationHITs):
-            CaptionAndValidationLoop(mtc, RedoCationHITs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+            CaptionAndValidationLoop(mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+
