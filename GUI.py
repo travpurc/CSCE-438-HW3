@@ -28,7 +28,7 @@ class Window(wx.Frame):
         
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         
-        uidText = wx.StaticText(panel,label="Username: ")
+        uidText = wx.StaticText(panel,label="Access ID: ")
         uidInput = wx.TextCtrl(panel)
         
         hbox.Add(uidText, flag=wx.RIGHT,border=8)
@@ -38,7 +38,7 @@ class Window(wx.Frame):
         vbox.Add((-1,10))
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         
-        uidText = wx.StaticText(panel,label="Password: ")
+        uidText = wx.StaticText(panel,label="Secret Key: ")
         uidInput = wx.TextCtrl(panel)
         
         hbox2.Add(uidText, flag=wx.RIGHT,border=8)
