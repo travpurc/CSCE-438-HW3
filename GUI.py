@@ -20,12 +20,14 @@ import SRTGenerator
 import GUI
 import CaptionAndValidate
 import wx
+import Tkinter, tkFileDialog
 
 #TODO: Merge HW3 into this file or visa versa
 class FirstPanel(wx.Panel):
 
     def __init__(self,parent):
         wx.Panel.__init__(self,parent,wx.ID_ANY)
+        self.parent = parent
         vbox = wx.BoxSizer(wx.VERTICAL)
         
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -58,11 +60,12 @@ class FirstPanel(wx.Panel):
         vbox.Add(hbox3, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         
         self.SetSizer(vbox)
-        self.Layout()
+        self.GetParent().Layout()
 
 class SecondPanel(wx.Panel):
     def __init__(self,parent):
         wx.Panel.__init__(self,parent,wx.ID_ANY)
+        self.parent = parent
         vbox = wx.BoxSizer(wx.VERTICAL)
         
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -79,9 +82,13 @@ class SecondPanel(wx.Panel):
         
         self.dirText = wx.StaticText(self,label="Save Location: ")
         self.dirInput = wx.TextCtrl(self)
-        
+        self.selectdir = wx.Button(self,-1,"Dir")
+        self.selectdir.Bind(wx.EVT_BUTTON,self.DisplayDirDlg)
+
         hbox2.Add(self.dirText, flag=wx.RIGHT,border=8)
         hbox2.Add(self.dirInput,proportion=1,border = 30)
+        hbox2.Add((10,-1))
+        hbox2.Add(self.selectdir,proportion=0,border=30)
         vbox.Add(hbox2, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         
         vbox.Add((-1,10))
@@ -95,6 +102,20 @@ class SecondPanel(wx.Panel):
         vbox.Add(hbox3, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         
         self.SetSizer(vbox)
+    
+    def DisplayDirDlg(self,e):
+        print 'selecting directory'
+        #dirdlg = wx.MessageDialog(None,"Select Directory",style=wx.DD_DEFAULT_STYLE)
+#test = EasyDialogs.AskFolder()
+
+#Windows
+#  root = Tkinter.Tk()
+#       dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",titl='Please select a directory')
+#       if len(dirname ) > 0:
+#           print "You chose %s" % dirname
+#ret = dirdlg.ShowModal()
+    
+
 
 
 class FirstWindow(wx.Frame):
@@ -104,15 +125,20 @@ class FirstWindow(wx.Frame):
         self.InitWind()
         self.Centre()
         self.Bind(wx.EVT_CLOSE,self.OnClose)
-        self.Show()
+    #self.Show()
     
     def InitWind(self):
         
+        self.panel1 = FirstPanel(self)
+        # self.panel1.Show()
         self.panel2 = SecondPanel(self)
-        self.panel2.Show()
-    #self.panel2 = SecondPanel(self)
-    #self.panel2.Hide()
-        
+        self.panel2.Hide()
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+        vSizer.Add(self.panel1,1,wx.EXPAND)
+        vSizer.Add(self.panel2,1,wx.EXPAND)
+        self.SetSizer(vSizer)
+
+#self.Layout()
     
     def OnClose(self,e):
         dlg = wx.MessageDialog(None,'Are you sure you want to quit?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
@@ -140,8 +166,9 @@ class FirstWindow(wx.Frame):
         else:
             print "logged in"
             self.panel1.Hide()
-            self.panel2 = SecondPanel(self)
+            #self.panel2 = SecondPanel(self)
             self.panel2.Show()
+            self.Layout()
             #self.Destroy()
        
     def IncorrectCredentials(self):
@@ -160,5 +187,5 @@ if __name__ == '__main__':
     app = wx.App(False)
     FirstWindow = FirstWindow(None,-1,"Crowd Captioners")
     #SecondWindow = Window(None,-1,"Crowd Captioners")
-    
+    FirstWindow.Show(True)
     app.MainLoop()
