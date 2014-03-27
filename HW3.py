@@ -26,8 +26,10 @@ import YouTube
 #-------------------------------
 
 #TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
+embedded_video_length = 20;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
+embedded_urls = []
 
 #Payment - Check HITGeneration.py config global
 
@@ -60,6 +62,9 @@ url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
 #url = raw_input("Youtube Link: ")
 
 YouTube.GetYouTubeData(url, total_time, embedded_video_length, embedded_urls, video_start, video_end, count)
+count = len(embedded_urls)
+total_time = video_end.pop()
+video_end.append(total_time)
 
 #-------------------------------
 #-------- AWS Connection -------
