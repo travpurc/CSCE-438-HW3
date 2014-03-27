@@ -27,7 +27,7 @@ validationHurdle = 0.95             #Requires that answers be this similar [0,1]
 #Evaluates similarity of two strings and returns a bool
 def similar(string1, string2, hurdle):
     areSimilar = hurdle #Hurdle value to determine similarity
-    return difflib.SequenceMatcher(a=seq1.lower(), b=seq2.lower()).ratio() > areSimilar
+    return difflib.SequenceMatcher(a=string1.lower(), b=string2.lower()).ratio() > areSimilar
 
 #Get all HITs that have all assignments completed
 def get_all_reviewable_hits(mtc):
@@ -63,7 +63,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #-------------------------------
     
     Validation_HIT_Count = 0    #Number of validation hits generated
-
+    print "Count = " + str(count)
     while count > 0:
         hits = []
         while hits == []:
@@ -81,18 +81,18 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
         #tie new validation HIT to old video segment HIT
         #pay workers based on some security question and some form of valid entry in text field - OR - security questions and validation results
         #loop as needed
-
+        valid = False
         for hit in hits:
             HIT_Answers = []
             assignments = mtc.get_assignments(hit.HITId)
             for assignment in assignments:
                 print "Worker ID:"+assignment.WorkerId+"\nAssignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
                 for question_form_answer in assignment.answers[0]:
-                    try:
-                        for key, value in question_form_answer.fields:
-                            HIT_Answers.append(value)
-                            print "%s - %s" % (key,value)
-                    except:
+                    #try:
+                    #    for key, value in question_form_answer.fields:
+                    #        HIT_Answers.append(value)
+                    #        print "%s - %s" % (key,value)
+                    #except:
                         for value in question_form_answer.fields:
                             HIT_Answers.append(value)
                             print value
@@ -115,28 +115,32 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                         break
                     #Otherwise, check how similar the answers
                     for a2 in HIT_Answers:
-                        print a1 + " and " + a2
-                        if HITGeneration.similar(a1, a2, validationHurdle):
+                        if similar(a1, a2, validationHurdle):
                             similarity += validationHurdle;
                 #If the responses are the same or they are similar enough then accept the 1st response
                 if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
                     print "Passed Validation Hurdle... No Validation HIT generated..."
-                    mtc.approve_assignment(assignment.AssignmentId)
-                    Completed_HITs.append((hit.HITId, "NONE"))
+                    #mtc.approve_assignment(assignment.AssignmentId)
+                    valid = True
                     Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
-                    mtc.disable_hit(hit.HITId)
+                    #mtc.disable_hit(hit.HITId)
                 else:
                     #TODO: If the captions are not similar enough
                     embedded_url = embedded_urls[HIT_IDs.index(hit.HITId)]
                     ValidationID = HITGeneration.GenerateValidationHIT(mtc, HIT_Answers, embedded_url)
+                    print "ValidationHitID = "+ ValidationID
                     HITId_and_ValidationID = (hit.HITId, ValidationID)
                     Validation_HIT_Count += 1
-                    Completed_HITs.append(HITId_and_ValidationID)
-                    mtc.disable_hit(hit.HITId)
+                    #mtc.disable_hit(hit.HITId)
+                #mtc.approve_assignment(assignment.AssignmentId)
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-                count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
+        if valid:
+            Completed_HITs.append((hit.HITId, "NONE"))
+        else:
+            Completed_HITs.append(HITId_and_ValidationID)
+        count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             
-
+    print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
     print Completed_HITs
 
@@ -146,7 +150,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #By this time all validation HITs have been generated (if any)
     RedoCationHITs = []
 
-    while Validation_HIT_Count > 0:
+    while Validation_HIT_Count > 0 and count == 0:
         validation_hits = []
         while validation_hits == []:
             validation_hits = get_all_reviewable_hits(mtc)
@@ -162,11 +166,11 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
             for assignment in assignments:
                 print "Worker ID:"+assignment.WorkerId+"\nValidation Assignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
                 for question_form_answer in assignment.answers[0]:
-                    try:
-                        for key, value in question_form_answer.fields:
-                            HIT_Answers.append(value)
-                            print "%s - %s" % (key,value)
-                    except:
+                    #try:
+                    #    for key, value in question_form_answer.fields:
+                    #        HIT_Answers.append(value)
+                    #        print "%s - %s" % (key,value)
+                    #except:
                         for value in question_form_answer.fields:
                             HIT_Answers.append(value)
                             print value
@@ -177,7 +181,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                 if HIT_Answers[0] == "None of the Above":
                     HITId = HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, embedded_urls)[0]
                     RedoCationHITs.append(HITId)
-                    mtc.approve_assignment(assignment.AssignmentId)
+                    #mtc.approve_assignment(assignment.AssignmentId)
 
                     #Remove the assignment from completed list since it failed and has to be recreated
                     removing = [i for i, v in enumerate(Completed_HITs) if v[0] == hit.HITId]
@@ -185,12 +189,12 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
 
                 else:
                     Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
-                    mtc.approve_assignment(assignment.AssignmentId)
 
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-                Validation_HIT_Count -= 1   #Got the result from a video segment HIT (regardless of validation it happened)
-                mtc.disable_hit(hit.HITId)  #Disable hit regardless
+        Validation_HIT_Count -= 1   #Got the result from a video segment HIT (regardless of validation it happened)
+                #mtc.approve_assignment(assignment.AssignmentId)
+                #mtc.disable_hit(hit.HITId)  #Disable hit regardless
 
-        if not len(RedoCationHITs):
-            CaptionAndValidationLoop(mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+    if not len(RedoCationHITs):
+        CaptionAndValidationLoop(mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
 

@@ -145,7 +145,6 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
 
 #Generates a validation HIT, Takes a Caption HIT ID, a list of possible answers and returns a validation HIT ID
 def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
-    HIT_ID
     title = 'Give your opinion about a website'
     description = ('Visit a website and give us your opinion about'
                     ' the design and also some personal comments')

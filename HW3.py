@@ -37,7 +37,7 @@ video_end = []
 #Payment - Check HITGeneration.py config global
 
 #TODO: Make assignmentNum 3, but impossible to test alone above 1
-assignmentNum = 1                   #Number of times the videos will be captioned
+assignmentNum = 2                   #Number of times the videos will be captioned
 validationNum = 1                   #Number of times the Caption HITs will validated
 
 #-------------------------------
@@ -164,7 +164,7 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 #TODO: Remove?
 print mtc.get_account_balance() 
 
-#TODO: Remove? - DELETES ALL PREVIOUS USER HITS (Resets for testing...)
+#TODO: Remove - DELETES ALL PREVIOUS USER HITS (Resets for testing...)
 Reset = mtc.get_all_hits()
 for hit in Reset:
     mtc.disable_hit(hit.HITId)
@@ -188,5 +188,13 @@ print "Accepted Answers: "
 print Accepted_Answers
 
 SRTGenerator.GenerateSRT(data_title, total_time, embedded_video_length, video_start, video_end, Completed_HITs, Accepted_Answers)
+
+'''
+#TODO: Remove - DELETES ALL PREVIOUS USER HITS (Resets for testing...)
+Reset = mtc.get_all_hits()
+for hit in Reset:
+    mtc.disable_hit(hit.HITId)
+    print "Old HIT: " + hit.HITId + " - Disabled/Approved"
+'''
 
 print "//////////////////// COMPLETED \\\\\\\\\\\\\\\\\\\\"
