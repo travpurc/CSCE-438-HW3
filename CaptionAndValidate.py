@@ -26,8 +26,7 @@ validationHurdle = 0.95             #Requires that answers be this similar [0,1]
 
 #Evaluates similarity of two strings and returns a bool
 def similar(string1, string2, hurdle):
-    areSimilar = hurdle #Hurdle value to determine similarity
-    return difflib.SequenceMatcher(a=string1.lower(), b=string2.lower()).ratio() > areSimilar
+    return difflib.SequenceMatcher(a=string1.lower(), b=string2.lower()).ratio() > hurdle
 
 #Get all HITs that have all assignments completed
 def get_all_reviewable_hits(mtc):
@@ -51,8 +50,6 @@ def get_all_reviewable_hits(mtc):
         temp_hits = mtc.get_reviewable_hits(page_size=page_size,page_number=pn)
         hits.extend(temp_hits)
     return hits
-
-
 
 
 #By FAR the most time consuming function
@@ -83,6 +80,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
         #loop as needed
         valid = False
         for hit in hits:
+            mtc.set_reviewing(hit.HITId)
             HIT_Answers = []
             assignments = mtc.get_assignments(hit.HITId)
             for assignment in assignments:
@@ -120,7 +118,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                 #If the responses are the same or they are similar enough then accept the 1st response
                 if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
                     print "Passed Validation Hurdle... No Validation HIT generated..."
-                    #mtc.approve_assignment(assignment.AssignmentId)
+                    mtc.approve_assignment(assignment.AssignmentId)
                     valid = True
                     Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
                     #mtc.disable_hit(hit.HITId)
@@ -132,18 +130,19 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                     HITId_and_ValidationID = (hit.HITId, ValidationID)
                     Validation_HIT_Count += 1
                     #mtc.disable_hit(hit.HITId)
-                #mtc.approve_assignment(assignment.AssignmentId)
+                    #mtc.approve_assignment(assignment.AssignmentId)
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
         if valid:
             Completed_HITs.append((hit.HITId, "NONE"))
         else:
             Completed_HITs.append(HITId_and_ValidationID)
         count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
-            
+        mtc.dispose_hit(hit.HITId)
+         
     print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
     print Completed_HITs
-
+        
     #-------------------------------
     #--- Validation Holding Loop ---
     #-------------------------------
@@ -151,6 +150,7 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     RedoCationHITs = []
 
     while Validation_HIT_Count > 0 and count == 0:
+        print "Validation Count = " + str(count)
         validation_hits = []
         while validation_hits == []:
             validation_hits = get_all_reviewable_hits(mtc)
@@ -195,6 +195,6 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                 #mtc.approve_assignment(assignment.AssignmentId)
                 #mtc.disable_hit(hit.HITId)  #Disable hit regardless
 
-    if not len(RedoCationHITs):
+    if len(RedoCationHITs) > 0:
         CaptionAndValidationLoop(mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
 

@@ -7,13 +7,21 @@ Vishal Anand
 Travis Purcell
 Ricardo Zavala
 
-File Created by: Travis Purcell
+File Created by: Travis Purcell, Vishal Anand
 
 Purpose: Contains GUI functions
 '''
-
+#-------------------------------
+# ----------- Import -----------
+#-------------------------------
+from boto.mturk.connection import MTurkConnection
+import HITGeneration
+import SRTGenerator
+import GUI
+import CaptionAndValidate
 import wx
 
+#TODO: Merge HW3 into this file or visa versa
 class FirstPanel(wx.Panel):
 
     def __init__(self,parent):
