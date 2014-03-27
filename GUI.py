@@ -31,6 +31,7 @@ class FirstWindow(wx.Frame):
         self.InitWind()
         self.Centre()
         self.Bind(wx.EVT_CLOSE,self.OnClose)
+        self.SetBackgroundColour(wx.Colour(191,239,255))
     #self.Show()
     
     def InitWind(self):
