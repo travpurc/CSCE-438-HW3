@@ -14,11 +14,11 @@ Purpose: Contains GUI functions
 #-------------------------------
 # ----------- Import -----------
 #-------------------------------
-from boto.mturk.connection import MTurkConnection
-import HITGeneration
-import SRTGenerator
-import GUI
-import CaptionAndValidate
+#from boto.mturk.connection import MTurkConnection
+#import HITGeneration
+#import SRTGenerator
+#import GUI
+#import CaptionAndValidate
 import wx
 import Tkinter, tkFileDialog
 
@@ -105,17 +105,8 @@ class SecondPanel(wx.Panel):
     
     def DisplayDirDlg(self,e):
         print 'selecting directory'
-        #dirdlg = wx.MessageDialog(None,"Select Directory",style=wx.DD_DEFAULT_STYLE)
-#test = EasyDialogs.AskFolder()
-
-#Windows
-#  root = Tkinter.Tk()
-#       dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",titl='Please select a directory')
-#       if len(dirname ) > 0:
-#           print "You chose %s" % dirname
-#ret = dirdlg.ShowModal()
-    
-
+        dirdlg = wx.DirDialog(None,"Select Directory",style=wx.DD_DEFAULT_STYLE)
+        test = dirdlg.ShowModal()
 
 
 class FirstWindow(wx.Frame):
