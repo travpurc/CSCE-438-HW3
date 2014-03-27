@@ -14,7 +14,7 @@ Purpose: Contains GUI functions
 #-------------------------------
 # ----------- Import -----------
 #-------------------------------
-#from boto.mturk.connection import MTurkConnection
+from boto.mturk.connection import MTurkConnection
 #import HITGeneration
 #import SRTGenerator
 #import GUI
@@ -62,19 +62,21 @@ class FirstWindow(wx.Frame):
         id = self.panel1.uidInput.GetValue()
         secret_key = self.panel1.pwdInput.GetValue()
         print "Submit has been clicked. Key is %s. Password is %s" % (id, secret_key)
-            # mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
-            #                 aws_secret_access_key=SECRET_KEY,
-            #                 host=HOST)
          #Call the MTurkConnection function - if valid next screen, else dialoguebox
-        if id=="abc":
-            self.IncorrectCredentials()
-            self.panel1.uidInput.Clear()
-            self.panel1.pwdInput.Clear()
-        else:
+        HOST = 'mechanicalturk.sandbox.amazonaws.com'
+        try:
+            mtc = MTurkConnection(aws_access_key_id=id, aws_secret_access_key=secret_key,host=HOST)
+            print mtc.get_account_balance()
             print "logged in"
             self.panel1.Hide()
             self.panel2.Show()
             self.Layout()
+        except:
+            print 'error'
+            self.IncorrectCredentials()
+            self.panel1.uidInput.Clear()
+            self.panel1.pwdInput.Clear()
+
 
     def IncorrectCredentials(self):
         dlg = wx.MessageDialog(None,'Incorrect Credentials. Please try again.','Incorrect Credentials',wx.OK | wx.ICON_ERROR)
