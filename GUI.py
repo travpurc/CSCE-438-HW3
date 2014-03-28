@@ -121,7 +121,7 @@ class FirstWindow(wx.Frame):
         Completed_HITs = []         #Used to link caption and validation HITs
         Accepted_Answers = []       #Used to build the SRT File
         
-        dlg = wx.GenericProgressDialog("Progress", "Progress", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
+        dlg = wx.GenericProgressDialog("Progress", "Loading...", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
         start(CaptionAndValidate.CaptionAndValidationLoop, dlg,self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
         dlg.ShowModal()
         #CaptionAndValidate.CaptionAndValidationLoop(self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)

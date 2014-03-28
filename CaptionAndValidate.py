@@ -71,7 +71,6 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
         while hits == []:
             hits = get_all_reviewable_hits(mtc)
             if hits == []:
-                wx.CallAfter(dlg.Update,1,"Video Segments Remaining: %d of %d" (count,TOTAL_HITS))
                 time.sleep(30)  #Wait for a bit...
             #print hits
         print "---------------- HIT(s) Reviewable -----------------------"
@@ -144,7 +143,10 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                     Completed_HITs.append(HITId_and_ValidationID)
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             mtc.dispose_hit(hit.HITId)
-         
+            updateString = "Video Segments Remaining: %d of %d" (count,TOTAL_HITS)
+            wx.CallAfter(dlg.Update,1,updateString)
+
+
     print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
     print Completed_HITs
