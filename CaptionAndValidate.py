@@ -18,6 +18,7 @@ Purpose: Contains HIT and Validation Loop Functions
 import time
 import HITGeneration
 import difflib
+import wx
 
 #-------------------------------
 #------- Config Globals --------
@@ -58,7 +59,11 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #-------------------------------
     #--------- Holding Loop --------
     #-------------------------------
-    
+    #dlg = wx.GenericProgressDialog("test", "test", maximum=count, parent=None,
+    #                        style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
+    #dlgcount = 10
+
+      
     Validation_HIT_Count = 0    #Number of validation hits generated
     print "Count = " + str(count)
     while count > 0:
@@ -66,6 +71,8 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
         while hits == []:
             hits = get_all_reviewable_hits(mtc)
             if hits == []:
+                #dlgcount+=5
+                # dlg.Update(dlgcount, "Loading")
                 time.sleep(30)  #Wait for a bit...
             #print hits
         print "---------------- HIT(s) Reviewable -----------------------"
@@ -132,12 +139,12 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
                     #mtc.disable_hit(hit.HITId)
                     #mtc.approve_assignment(assignment.AssignmentId)
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-        if valid:
-            Completed_HITs.append((hit.HITId, "NONE"))
-        else:
-            Completed_HITs.append(HITId_and_ValidationID)
-        count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
-        mtc.dispose_hit(hit.HITId)
+            if valid:
+                Completed_HITs.append((hit.HITId, "NONE"))
+            else:
+                    Completed_HITs.append(HITId_and_ValidationID)
+            count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
+            mtc.dispose_hit(hit.HITId)
          
     print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"

@@ -71,23 +71,40 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
                        ' of it')
         keywords = 'video, captioning, short'
  
+<<<<<<< HEAD
         ratings =[('Short (<15 secs)','-1'),
                  ('Medium (>15 secs, <1 min)','0'),
                  ('Long (>1 min)','1')]#,
+=======
+        ratings =[('Short (&lt;15 secs)','-1'),
+                 ('Medium (&gt;15 secs, &lt;1 min)','0'),
+                 ('Long (&gt;1 min)','1')]#,
+>>>>>>> 4c4468e3213636d21d668dbbabc419188df746f8
                  #('Good','1'),
                  #('Very Good','2')]
  
         #---------------  BUILD OVERVIEW -------------------
  
         overview = Overview()
+<<<<<<< HEAD
         overview.append_field('Title', 'Follow the link')
         overview.append(FormattedContent('<a target="_blank" href="' + str(embedded_urls[i]) + '"> Click here for the short video</a>'
+=======
+        overview.append_field('Title', title)
+        overview.append(FormattedContent('<a target="_blank"'
+                                         ' href="' + embedded_urls[i] + '">'
+                                         ' Click here for the short video</a>'
+>>>>>>> 4c4468e3213636d21d668dbbabc419188df746f8
                                          ))
  
         #---------------  BUILD QUESTION 1 -------------------
  
         qc1 = QuestionContent()
+<<<<<<< HEAD
         qc1.append_field('Title','Is the video')
+=======
+        qc1.append_field('Title','Is the video:')
+>>>>>>> 4c4468e3213636d21d668dbbabc419188df746f8
  
         fta1 = SelectionAnswer(min=1, max=1,style='dropdown',
                               selections=ratings,
@@ -159,7 +176,11 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     overview = Overview()
     overview.append_field('Title', title)
     overview.append(FormattedContent('<a target="_blank"'
+<<<<<<< HEAD
                                      ' href="' + embedded_urls[i] + '">'
+=======
+                                     ' href="' + embedded_url + '">'
+>>>>>>> 4c4468e3213636d21d668dbbabc419188df746f8
                                      ' Click here for the short video</a>'))
  
     #--------------- BUILD QUESTION 1 -------------------
@@ -211,3 +232,4 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     print "https://workersandbox.mturk.com/mturk/preview?groupId=" + new_hit[0].HITTypeId
 
     return new_hit[0].HITId
+
