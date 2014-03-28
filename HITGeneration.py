@@ -207,7 +207,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     
     print new_hit[0].HITId
     #print new_hit[0].HITTypeId
-    print "https://workersandbox.mturk.com/mturk/preview?groupId=" + new_hit[0].HITTypeId
+    print "\nValidation hit group = : https://workersandbox.mturk.com/mturk/preview?groupId=" + new_hit[0].HITTypeId +"\n"
 
     return new_hit[0].HITId
 

@@ -127,6 +127,7 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                     valid = True
                     Accepted_Answers.append((hit.HITId, HIT_Answers[0]))
                     #mtc.disable_hit(hit.HITId)
+                    #mtc.set_reviewing(hit.HITId)
                 else:
                     #TODO: If the captions are not similar enough
                     embedded_url = embedded_urls[HIT_IDs.index(hit.HITId)]
@@ -136,6 +137,7 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                     Validation_HIT_Count += 1
                     #mtc.disable_hit(hit.HITId)
                     #mtc.approve_assignment(assignment.AssignmentId)
+                    #mtc.set_reviewing(hit.HITId)
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
             if valid:
                 Completed_HITs.append((hit.HITId, "NONE"))
@@ -143,7 +145,6 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                     Completed_HITs.append(HITId_and_ValidationID)
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             #mtc.dispose_hit(hit.HITId)
-            mtc.set_reviewing(hit.HITId)
             #updateString = "Video Segments Remaining: %d of %d" (count,TOTAL_HITS)
             wx.CallAfter(dlg.Update,1,"Loading...")
 
@@ -158,9 +159,8 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
     #By this time all validation HITs have been generated (if any)
     wx.CallAfter(dlg.Update,0,"Validating and Generating .srt File")
     RedoCationHITs = []
-
     while Validation_HIT_Count > 0 and count == 0:
-        print "Validation Count = " + str(count)
+        print "Validation Count = " + str(Validation_HIT_Count)
         validation_hits = []
         while validation_hits == []:
             validation_hits = get_all_reviewable_hits(mtc)
