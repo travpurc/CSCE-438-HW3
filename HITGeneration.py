@@ -66,30 +66,30 @@ Validtion_Price = 0.02
 def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
     HIT_IDs = []
     for i in range(0, n):
-        title = 'Give your opinion about a website'
-        description = ('Visit a website and give us your opinion about'
-                       ' the design and also some personal comments')
-        keywords = 'website, rating, opinions'
+        title = 'Provide a caption of a following video'
+        description = ('Watch a short video and type in a transcription'
+                       ' of it')
+        keywords = 'video, captioning, short'
  
-        ratings =[('Very Bad','-2'),
-                 ('Bad','-1'),
-                 ('Not bad','0'),
-                 ('Good','1'),
-                 ('Very Good','2')]
+        ratings =[('Short (&lt;15 secs)','-1'),
+                 ('Medium (&gt;15 secs, &lt;1 min)','0'),
+                 ('Long (&gt;1 min)','1')]#,
+                 #('Good','1'),
+                 #('Very Good','2')]
  
         #---------------  BUILD OVERVIEW -------------------
  
         overview = Overview()
-        overview.append_field('Title', 'Give your opinion on this website')
+        overview.append_field('Title', title)
         overview.append(FormattedContent('<a target="_blank"'
-                                         ' href="http://www.toforge.com">'
-                                         ' Mauro Rocco Personal Forge</a>'
+                                         ' href="' + embedded_urls[i] + '">'
+                                         ' Click here for the short video</a>'
                                          ))
  
         #---------------  BUILD QUESTION 1 -------------------
  
         qc1 = QuestionContent()
-        qc1.append_field('Title','How looks the design ?')
+        qc1.append_field('Title','Is the video:')
  
         fta1 = SelectionAnswer(min=1, max=1,style='dropdown',
                               selections=ratings,
@@ -104,7 +104,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
         #---------------  BUILD QUESTION 2 -------------------
  
         qc2 = QuestionContent()
-        qc2.append_field('Title','Your personal comments')
+        qc2.append_field('Title','What are the words spoken in the video?')
  
         fta2 = FreeTextAnswer()
  
@@ -116,7 +116,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
  
         question_form = QuestionForm()
         question_form.append(overview)
-        #question_form.append(q1)
+        question_form.append(q1)
         question_form.append(q2)
  
         #--------------- CREATE THE HIT -------------------
@@ -145,29 +145,29 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
 
 #Generates a validation HIT, Takes a Caption HIT ID, a list of possible answers and returns a validation HIT ID
 def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
-    title = 'Give your opinion about a website'
-    description = ('Visit a website and give us your opinion about'
-                    ' the design and also some personal comments')
-    keywords = 'website, rating, opinions'
+    title = 'Check the following options for the correct caption'
+    description = ('Select the caption that better transcribes what is'
+                    ' said in a video')
+    keywords = 'video, rating, validation'
  
-    ratings = [('Very Bad','-2'),
-                ('Bad','-1'),
-                ('Not bad','0'),
-                ('Good','1'),
-                ('Very Good','2')]
+    ratings = [('No','0'),
+               ('Yes','1')]#,
+    CorrectAnswer = [(PossibleAnswers[0],'0'),
+                     (PossibleAnswers[1],'1'),
+                     ('None of the above','2')]
  
     #--------------- BUILD OVERVIEW -------------------
  
     overview = Overview()
-    overview.append_field('Title', 'Give your opinion on this website')
+    overview.append_field('Title', title)
     overview.append(FormattedContent('<a target="_blank"'
-                                        ' href="http://www.toforge.com">'
-                                        ' Mauro Rocco Personal Forge</a>'))
+                                     ' href="' + embedded_urls[i] + '">'
+                                     ' Click here for the short video</a>'))
  
     #--------------- BUILD QUESTION 1 -------------------
  
     qc1 = QuestionContent()
-    qc1.append_field('Title','How looks the design ?')
+    qc1.append_field('Title','Where you required to leave this page to complete the HIT?')
  
     fta1 = SelectionAnswer(min=1, max=1,style='dropdown',
                             selections=ratings,
@@ -182,9 +182,9 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     #--------------- BUILD QUESTION 2 -------------------
  
     qc2 = QuestionContent()
-    qc2.append_field('Title','Your personal comments')
+    qc2.append_field('Title','What is the correct transcription?')
  
-    fta2 = FreeTextAnswer()
+    fta2 = SelectionAnswer(min=1, max=1,style='radiobutton', selections=CorrectAnswer, type='text', other=False)#fta2 = FreeTextAnswer()
  
     q2 = Question(identifier="comments",
                     content=qc2,
@@ -194,7 +194,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
  
     question_form = QuestionForm()
     question_form.append(overview)
-    #question_form.append(q1)
+    question_form.append(q1)
     question_form.append(q2)
  
     #--------------- CREATE THE HIT -------------------
@@ -213,3 +213,4 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     print "https://workersandbox.mturk.com/mturk/preview?groupId=" + new_hit[0].HITTypeId
 
     return new_hit[0].HITId
+
