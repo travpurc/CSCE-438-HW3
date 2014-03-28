@@ -22,6 +22,7 @@ import wx
 import Tkinter, tkFileDialog
 import panels
 import YouTube
+import threading
 #TODO: Merge HW3 into this file or visa versa
 
 #-------------------------------
@@ -119,7 +120,11 @@ class FirstWindow(wx.Frame):
         HIT_IDs = HITGeneration.GenerateCaptionHIT(self.mtc, count, assignmentNum, embedded_urls)
         Completed_HITs = []         #Used to link caption and validation HITs
         Accepted_Answers = []       #Used to build the SRT File
-        CaptionAndValidate.CaptionAndValidationLoop(self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+        
+        dlg = wx.GenericProgressDialog("Progress", "Progress", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
+        start(CaptionAndValidate.CaptionAndValidationLoop, dlg,self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+        dlg.ShowModal()
+        #CaptionAndValidate.CaptionAndValidationLoop(self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
         
         print "Completed Hits: "
         print Completed_HITs
@@ -140,7 +145,10 @@ class FirstWindow(wx.Frame):
 
         e.Veto() #return to previous screen
 
-
+def start(func, *args): # helper method to run a function in another thread
+    thread = threading.Thread(target=func, args=args)
+    thread.setDaemon(True)
+    thread.start()
 
 if __name__ == '__main__':
     app = wx.App(False)
