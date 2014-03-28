@@ -143,7 +143,7 @@ class FirstWindow(wx.Frame):
                 self.mtc.disable_hit(hit.HITId)
                 print "Old HIT: " + hit.HITId + " - Disabled"
 
-        e.Veto() #return to previous screen
+        #e.Veto() #return to previous screen
 
 def start(func, *args): # helper method to run a function in another thread
     thread = threading.Thread(target=func, args=args)
