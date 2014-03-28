@@ -18,6 +18,7 @@ Purpose: Contains HIT and Validation Loop Functions
 import time
 import HITGeneration
 import difflib
+import wx
 
 #-------------------------------
 #------- Config Globals --------
@@ -58,7 +59,11 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
     #-------------------------------
     #--------- Holding Loop --------
     #-------------------------------
-    
+    dlg = wx.GenericProgressDialog("test", "test", maximum=count, parent=None,
+                             style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
+    dlgcount = 10
+
+      
     Validation_HIT_Count = 0    #Number of validation hits generated
     print "Count = " + str(count)
     while count > 0:
@@ -66,6 +71,8 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
         while hits == []:
             hits = get_all_reviewable_hits(mtc)
             if hits == []:
+                dlgcount+=5
+                dlg.Update(dlgcount, "Loading")
                 time.sleep(30)  #Wait for a bit...
             #print hits
         print "---------------- HIT(s) Reviewable -----------------------"
