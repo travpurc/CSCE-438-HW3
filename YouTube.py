@@ -20,7 +20,7 @@ import urllib2
 import re
 
 #Fills in key data for the main program
-def GetYouTubeData(url, total_time, embedded_video_length, embedded_urls, video_start, video_end, count):
+def GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end):
     try:
         Video_ID = re.search( "v=(.*)&|v=(.*)", url)
         if Video_ID.group(1) == None:
@@ -77,6 +77,7 @@ def GetYouTubeData(url, total_time, embedded_video_length, embedded_urls, video_
     #-------------------------------
     seconds = 0
     total_time = int(data_duration)     #duration of original video
+    count = 0
     #total_time = 60
     while (seconds < total_time):       #Build the start and end arrays
          video_start.append(seconds)

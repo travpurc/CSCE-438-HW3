@@ -21,7 +21,32 @@ import CaptionAndValidate
 import wx
 import Tkinter, tkFileDialog
 import panels
+import YouTube
 #TODO: Merge HW3 into this file or visa versa
+
+#-------------------------------
+#-------- Config Globals -------
+#-------------------------------
+
+#TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
+embedded_video_length = 20;         #Embedded video length is n+1 watch time
+video_start = []                    #Arrays of the sequential start and end times
+video_end = []
+embedded_urls = []
+
+#Payment - Check HITGeneration.py config global
+
+#TODO: Make assignmentNum 3, but impossible to test alone above 1
+assignmentNum = 2                   #Number of times the videos will be captioned
+validationNum = 1                   #Number of times the Caption HITs will validated
+
+#-------------------------------
+#------- Regular Globals -------
+#-------------------------------
+
+#total_time = 0                         #Duration of embedded video - last segment is just remaining time of original video
+#count = 0                           #number of video segments (aka HITs)
+
 
 class FirstWindow(wx.Frame):
     
@@ -54,7 +79,6 @@ class FirstWindow(wx.Frame):
             e.Veto()
 
     def OnSubmit(self,e):
-        
         id = self.panel1.uidInput.GetValue()
         secret_key = self.panel1.pwdInput.GetValue()
         print 'Submit has been clicked. Key is %s' %id
@@ -69,8 +93,8 @@ class FirstWindow(wx.Frame):
             self.panel1.Hide()
             self.panel2.Show()
             self.Layout()
-        except mtc.MTurkRequestError as err:
-            print 'error', err.code
+        except :
+            print 'error'
             self.IncorrectCredentials()
             self.panel1.uidInput.Clear()
             self.panel1.pwdInput.Clear()
@@ -86,9 +110,12 @@ class FirstWindow(wx.Frame):
 
     def OnCaption(self,e):
         print "caption the video"
-        count = 1
-        assignmentNum = 2
-        embedded_urls  = ['http://www.youtube.com/watch?v=KaqC5FnvAEc']
+        url = self.panel2.vidInput.GetValue()
+        #url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
+        YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
+        count = len(embedded_urls)
+        total_time = video_end.pop()
+        video_end.append(total_time)
         HIT_IDs = HITGeneration.GenerateCaptionHIT(self.mtc, count, assignmentNum, embedded_urls)
         Completed_HITs = []         #Used to link caption and validation HITs
         Accepted_Answers = []       #Used to build the SRT File
@@ -99,6 +126,20 @@ class FirstWindow(wx.Frame):
         print "Accepted Answers: "
         print Accepted_Answers
         e.Veto()
+
+    def OnReset(self,e):
+        dlg = wx.MessageDialog(None,'Are you sure you want to delete all previous HITs?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        
+        ret = dlg.ShowModal()
+        
+        if ret== wx.ID_YES:
+            Reset = self.mtc.get_all_hits()
+            for hit in Reset:
+                self.mtc.disable_hit(hit.HITId)
+                print "Old HIT: " + hit.HITId + " - Disabled"
+
+        e.Veto() #return to previous screen
+
 
 
 if __name__ == '__main__':

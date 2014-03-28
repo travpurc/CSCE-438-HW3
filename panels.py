@@ -90,9 +90,14 @@ class SecondPanel(wx.Panel):
         hbox3.Add(self.CaptionButton,wx.CENTER,border=10)
         vbox.Add(hbox3, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         
-        #vbox.Add((-1,20))
+        vbox.Add((-1,30))
         
-        #hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.ResetButton = wx.Button(self,-1,"Reset HITs")
+        self.ResetButton.Bind(wx.EVT_BUTTON,parent.OnReset)
+        hbox4.Add(self.ResetButton,wx.LEFT,border = 10)
+        
+        vbox.Add(hbox4, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         #self.NoHITsText = wx.StaticText(self,label="Hits Completed: %d"%0)
         
         self.SetSizer(vbox)
