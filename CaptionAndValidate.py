@@ -146,7 +146,7 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             #mtc.dispose_hit(hit.HITId)
             #updateString = "Video Segments Remaining: %d of %d" (count,TOTAL_HITS)
-            wx.CallAfter(dlg.Update,1,"Loading...")
+            wx.CallAfter(dlg.Update,TOTAL_HITS-count,"Loading...")
 
 
     print "Count = " + str(count)
