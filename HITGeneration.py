@@ -70,9 +70,9 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls):
         description = ('Watch a short video and type in a transcription'
                        ' of it')
         keywords = 'video, captioning, short'
-        ratings =[('Short (&lt;15 secs)','-1'),
+        ratings =[('Long (&gt;1 min)','-1'),
                  ('Medium (&gt;15 secs, &lt;1 min)','0'),
-                 ('Long (&gt;1 min)','1')]
+                 ('Short (&lt;15 secs)','1')]
  
         #---------------  BUILD OVERVIEW -------------------
  

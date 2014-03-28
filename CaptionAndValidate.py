@@ -55,7 +55,7 @@ def get_all_reviewable_hits(mtc):
 
 #By FAR the most time consuming function
 #Returns a list of validated answers
-def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers):
+def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers):
     #-------------------------------
     #--------- Holding Loop --------
     #-------------------------------
@@ -65,7 +65,10 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
     TOTAL_HITS = count
       
     Validation_HIT_Count = 0    #Number of validation hits generated
+    RedoCationHITs = []
     print "Count = " + str(count)
+    invalidCaption = False
+    invalidHit = ""
     while count > 0:
         hits = []
         while hits == []:
@@ -91,12 +94,7 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
             for assignment in assignments:
                 print "Worker ID:"+assignment.WorkerId+"\nAssignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
                 for question_form_answer in assignment.answers[0]:
-                    #try:
-                    #    for key, value in question_form_answer.fields:
-                    #        HIT_Answers.append(value)
-                    #        print "%s - %s" % (key,value)
-                    #except:
-                        for value in question_form_answer.fields:
+                    for value in question_form_answer.fields:
                             HIT_Answers.append(value)
                             print value
 
@@ -107,21 +105,27 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                 perfectAnswers = False
                 perfectAnswer = ""
                 #if assignmentNum > 1:
-                for a1 in HIT_Answers:
+                for i in range(0, len(HIT_Answers), 2):
+                    if HIT_Answers[i] != '1':
+                        print "WARNING: Invalid Caption Security Question Answer Detected... "
+                        invalidCaption = True
+                        invalidHit = hit.HITId
+                        break
                     #Check if all answers match
                     print HIT_Answers
-                    if HIT_Answers.count(a1) == assignmentNum:
-                        print "Count of a1: " + str(HIT_Answers.count(a1))
+                    if HIT_Answers.count(HIT_Answers[i+1]) == assignmentNum:
+                        print "Count of a1: " + str(HIT_Answers.count(HIT_Answers[i+1]))
                         print "--- !!! Total Validation !!! ---"
                         perfectAnswers = True
-                        perfectAnswer = a1
+                        perfectAnswer = HIT_Answers[i+1]
                         break
                     #Otherwise, check how similar the answers
-                    for a2 in HIT_Answers:
-                        if similar(a1, a2, validationHurdle):
+                    for j in range(0, len(HIT_Answers), 2):
+                        if similar(HIT_Answers[i+1], HIT_Answers[j+1], validationHurdle):
                             similarity += validationHurdle;
+                if invalid: break
                 #If the responses are the same or they are similar enough then accept the 1st response
-                if perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
+                elif perfectAnswers or (similarity/(assignmentNum*assignmentNum)) > validationHurdle:
                     print "Passed Validation Hurdle... No Validation HIT generated..."
                     mtc.approve_assignment(assignment.AssignmentId)
                     valid = True
@@ -139,16 +143,25 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
                     #mtc.approve_assignment(assignment.AssignmentId)
                     #mtc.set_reviewing(hit.HITId)
                 print "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-            if valid:
-                Completed_HITs.append((hit.HITId, "NONE"))
-            else:
-                    Completed_HITs.append(HITId_and_ValidationID)
+            if invalidCaption: break
+            elif valid: Completed_HITs.append((hit.HITId, "NONE"))
+            else: Completed_HITs.append(HITId_and_ValidationID)
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
             #mtc.dispose_hit(hit.HITId)
             #updateString = "Video Segments Remaining: %d of %d" (count,TOTAL_HITS)
-            wx.CallAfter(dlg.Update,TOTAL_HITS-count,"Loading...")
+            wx.CallAfter(dlg.Update,1,"Loading...")
 
+        if invalidCaption: break
+    if invalidCaption:
+        print "Recreating invald hit..."
+        embedded_url = embedded_urls[HIT_IDs.index(invalidHit)]
+        validHit = HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, [embedded_url]);
+        HIT_IDs.pop(HIT_IDs.index(invalidHit))
+        HIT_IDs.append(validHit)
+        embedded_urls.pop(embedded_urls.index(embedded_url))
+        embedded_urls.append(embedded_url)
 
+    #rebuild arrays
     print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
     print Completed_HITs
@@ -158,8 +171,8 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
     #-------------------------------
     #By this time all validation HITs have been generated (if any)
     wx.CallAfter(dlg.Update,0,"Validating and Generating .srt File")
-    RedoCationHITs = []
-    while Validation_HIT_Count > 0 and count == 0:
+    #RedoCationHITs = []
+    while y > 0 and count == 0 and not invalidCaption:
         print "Validation Count = " + str(Validation_HIT_Count)
         validation_hits = []
         while validation_hits == []:
@@ -176,14 +189,9 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
             for assignment in assignments:
                 print "Worker ID:"+assignment.WorkerId+"\nValidation Assignment ID: "+assignment.AssignmentId+"\nHIT ID: " + hit.HITId
                 for question_form_answer in assignment.answers[0]:
-                    #try:
-                    #    for key, value in question_form_answer.fields:
-                    #        HIT_Answers.append(value)
-                    #        print "%s - %s" % (key,value)
-                    #except:
-                        for value in question_form_answer.fields:
-                            HIT_Answers.append(value)
-                            print value
+                    for value in question_form_answer.fields:
+                        HIT_Answers.append(value)
+                        print value
 
                 #TODO: Modify HIT_Answers[0] based on the desgin implementation (int, str, etc... as well as indicies)... 
                 #Do a search/replace to be sure
@@ -204,8 +212,11 @@ def CaptionAndValidationLoop(dlg,mtc, HIT_IDs, count, assignmentNum, embedded_ur
         Validation_HIT_Count -= 1   #Got the result from a video segment HIT (regardless of validation it happened)
                 #mtc.approve_assignment(assignment.AssignmentId)
                 #mtc.disable_hit(hit.HITId)  #Disable hit regardless
-
-    if len(RedoCationHITs) > 0:
+    print "...... Popped out of validation loop......."
+    if invalidCaption: 
+        NewCount = count - len(Accepted_Answers)
+        CaptionAndValidationLoop(dlg, mtc, HIT_IDs, NewCount, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+    elif len(RedoCationHITs) > 0:
         CaptionAndValidationLoop(dlg,mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
-
-    wx.CallAfter(dlg.Destroy)
+    else:
+        wx.CallAfter(dlg.Destroy)
