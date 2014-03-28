@@ -161,7 +161,7 @@ def GenerateValidationHIT(mtc, PossibleAnswers, embedded_url):
     overview = Overview()
     overview.append_field('Title', title)
     overview.append(FormattedContent('<a target="_blank"'
-                                     ' href="' + embedded_urls[i] + '">'
+                                     ' href="' + embedded_url + '">'
                                      ' Click here for the short video</a>'))
  
     #--------------- BUILD QUESTION 1 -------------------
