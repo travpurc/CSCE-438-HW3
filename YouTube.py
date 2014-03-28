@@ -19,6 +19,7 @@ import requests
 import urllib2
 import re
 
+
 #Fills in key data for the main program
 def GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end):
     try:
@@ -100,3 +101,5 @@ def GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video
     #embedded_urls = []
     for i in range(0, count):
         embedded_urls.append("http://www.youtube.com/embed/"+Video_ID+"?autoplay=1&amp;modestbranding=1&amp;iv_load_policy=3&amp;showinfo=0&amp;rel=0&amp;start="+str(video_start[i])+"&amp;end="+str(video_end[i]))
+
+    return data_title

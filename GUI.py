@@ -113,7 +113,7 @@ class FirstWindow(wx.Frame):
         print "caption the video"
         url = self.panel2.vidInput.GetValue()
         #url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
-        YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
+        data_title = YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
         count = len(embedded_urls)
         total_time = video_end.pop()
         video_end.append(total_time)
