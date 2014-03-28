@@ -142,9 +142,10 @@ def CaptionAndValidationLoop(mtc, HIT_IDs, count, assignmentNum, embedded_urls, 
             if valid:
                 Completed_HITs.append((hit.HITId, "NONE"))
             else:
-                    Completed_HITs.append(HITId_and_ValidationID)
+                Completed_HITs.append(HITId_and_ValidationID)
             count -= 1 #Got the result from a video segment HIT (regardless of validation it happened)
-            mtc.dispose_hit(hit.HITId)
+            mtc.set_reviewing(hit.HITId)
+            #mtc.dispose_hit(hit.HITId)
          
     print "Count = " + str(count)
     print "---------------- NO MORE CAPTION HITS TO FIND -----------------------"
