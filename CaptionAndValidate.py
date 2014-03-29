@@ -77,15 +77,6 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
                 time.sleep(30)  #Wait for a bit...
             #print hits
         print "---------------- HIT(s) Reviewable -----------------------"
-    
-        #Design Notes:
-        #So.... A hit has had all it's assignments completed... but I can't see multiple assignments myself because I can't do them all... 
-        #so I have to guess how to get assignment data is organized and how to put it back in the correct order after verification...
-        #....
-        #assignment in assignments values into list, compare items in list (same or similar = good), develope new HIT for validation,
-        #tie new validation HIT to old video segment HIT
-        #pay workers based on some security question and some form of valid entry in text field - OR - security questions and validation results
-        #loop as needed
         valid = False
         for hit in hits:
             mtc.set_reviewing(hit.HITId)
