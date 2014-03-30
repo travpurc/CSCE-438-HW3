@@ -8,7 +8,7 @@ class FirstPanel(wx.Panel):
         
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.introText = wx.StaticText(self,label="\t\t\tWelcome to Crowd Caption\n\t\tPlease enter your credentials to continue.")
+        self.introText = wx.StaticText(self,label="Welcome to Crowd Caption\nPlease enter your credentials to continue.", style=wx.ALIGN_CENTRE)
         
         self.uidText = wx.StaticText(self,label="Access ID: ")
         self.uidInput = wx.TextCtrl(self)
@@ -51,7 +51,7 @@ class SecondPanel(wx.Panel):
         self.parent = parent
         vbox = wx.BoxSizer(wx.VERTICAL)
         
-        self.introText = wx.StaticText(self,label="\t\tPost a link to the Youtube Video you want captioned\n and chose a directory to save your .srt file.")
+        self.introText = wx.StaticText(self,label="Post a link to the Youtube Video you want captioned\n(Optional) Chose a directory to save your .srt file", style=wx.ALIGN_CENTRE)
         hbox0 = wx.BoxSizer(wx.HORIZONTAL)
         hbox0.Add(self.introText,wx.CENTER,border=50)
         vbox.Add(hbox0,flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)

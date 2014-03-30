@@ -61,7 +61,7 @@ class FirstWindow(wx.Frame):
         self.InitWind()
         self.Centre()
         self.Bind(wx.EVT_CLOSE,self.OnClose)
-        self.SetBackgroundColour(wx.Colour(191,239,255))
+        self.SetBackgroundColour(wx.Colour(159,197,248))
     
     def InitWind(self):
         self.panel1 = panels.FirstPanel(self)
