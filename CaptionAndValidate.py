@@ -7,11 +7,10 @@ Vishal Anand
 Travis Purcell
 Ricardo Zavala
 
-File Created by: Travis Purcell
+File Created by: Travis Purcell, Ricardo Zavala
 
 Purpose: Contains HIT and Validation Loop Functions
 '''
-
 #-------------------------------
 # ----------- Import -----------
 #-------------------------------
@@ -23,7 +22,7 @@ import wx
 #-------------------------------
 #------- Config Globals --------
 #-------------------------------
-validationHurdle = 0.95             #Requires that answers be this similar [0,1] to be considered the same
+validationHurdle = 0.85             #Requires that answers be this similar [0,1] to be considered the same
 
 #Evaluates similarity of two strings and returns a bool
 def similar(string1, string2, hurdle):
@@ -52,20 +51,96 @@ def get_all_reviewable_hits(mtc):
         hits.extend(temp_hits)
     return hits
 
+def find_position(hit_id, completed_hits):
+    r = 0
+    was_found = False
+    while not was_found:
+        was_found = completed_hits[r] == hit_id
+        r += 1
+    if was_found:
+        return r
+    print "\n---Shouldn't be here!!---\n"
+    return -1
+
+def make_direct_validation_hit(hit_id, completed_hits, urls):
+    #TODO
+    #read hit id, find its position in completed_hits (/2)
+    #and extract that url to generate NEW (not validation) hit
+    #update completed hit with new hitID   
+    pass
+
+def make_validation_hit(mtc, options, url):
+    return HITGeneration.GenerateValidationHIT(mtc, options, url)
+
+def check_results(mtc, completed_hits, hit_ids, urls):
+    answers = []
+    hits_available = get_all_reviewable_hits(mtc)
+    for hit in hits_available:
+        hit_id = hit.HITId
+        assignments = mtc.get_assignments(hit_id)
+        temp = []
+        for assignment in assignments:
+            for question_form_answer in assignment.answers[0]:
+                if question_form_answer.fields[0] != 1:
+                    hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
+                    temp.append([hit_id, ""])
+                temp.append([hit_id, question_form_answer.fields[1]])
+            # End first for
+        # End second for
+        answers.append(temp)
+    answers = validate(answers, completed_hits, mtc, hit_ids, urls)
+    return answers
+
+def validate(answers, completed_hits, mtc, hit_ids, urls):
+    valid_answers = []
+    for assignment in answers:
+        r = 0
+        s = 1
+        id_r = assignment[r][0]
+        if len(assignment) > 2: # There were repeats... Compare 1 and 3
+            s += 1
+        id_s = assignment[s][0]
+        answer1 = assignment[r][1]
+        answer2 = assignment[s][1]
+        # This should not happen, except after an invalid security answer:
+        t = find_position(completed_hits, id_r)
+        u = t
+        if id_r != id_s:
+            u = find_position(completed_hits, id_s)
+        if similar(answer1, answer2, validationHurdle):
+            valid_answers.append([u/2, answer1])
+        else:
+            make_validation_hit(mtc, [answer1, answer2], urls[hit_ids.index(id_r)])
+    return valid_answers
+
+def merge_answers(captions, accepted_answers):
+    for r in captions:
+        accepted_answers[r[0]] = r[1]
+    return len(captions)*2
 
 #By FAR the most time consuming function
 #Returns a list of validated answers
 def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers):
+    total_hits = count*assignmentNum
+    hits_remaining = total_hits
+    while hits_remaining > 0:
+        captions = check_results(mtc, Completed_HITs, HIT_IDs, embedded_urls)
+        valid_answers = merge_answers(captions, Accepted_Answers)
+        if valid_answers > 0:
+            hits_remaining -= len(valid_answers)
+        else:
+            time.sleep(30)
+    
     #-------------------------------
     #--------- Holding Loop --------
     #-------------------------------
     #dlg = wx.GenericProgressDialog("test", "test", maximum=count, parent=None,
     #                        style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
     #dlgcount = 10
-    TOTAL_HITS = count
-      
+'''    TOTAL_HITS = count
+
     Validation_HIT_Count = 0    #Number of validation hits generated
-    RedoCationHITs = []
+    RedoCaptionHITs = []
     print "Count = " + str(count)
     invalidCaption = False
     invalidHit = ""
@@ -144,7 +219,7 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
 
         if invalidCaption: break
     if invalidCaption:
-        print "Recreating invald hit..."
+        print "Recreating invalid hit..."
         embedded_url = embedded_urls[HIT_IDs.index(invalidHit)]
         validHit = HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, [embedded_url]);
         HIT_IDs.pop(HIT_IDs.index(invalidHit))
@@ -189,7 +264,7 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
                 #Check if the answer is the "None of the above" choice
                 if HIT_Answers[0] == "None of the Above":
                     HITId = HITGeneration.GenerateCaptionHIT(mtc, 1, assignmentNum, embedded_urls)[0]
-                    RedoCationHITs.append(HITId)
+                    RedoCaptionHITs.append(HITId)
                     #mtc.approve_assignment(assignment.AssignmentId)
 
                     #Remove the assignment from completed list since it failed and has to be recreated
@@ -207,7 +282,8 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
     if invalidCaption: 
         NewCount = count - len(Accepted_Answers)
         CaptionAndValidationLoop(dlg, mtc, HIT_IDs, NewCount, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
-    elif len(RedoCationHITs) > 0:
-        CaptionAndValidationLoop(dlg,mtc, RedoCationHITs, len(RedoCationHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
+    elif len(RedoCaptionHITs) > 0:
+        CaptionAndValidationLoop(dlg,mtc, RedoCaptionHITs, len(RedoCaptionHITs), assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
     else:
         wx.CallAfter(dlg.Destroy)
+'''
