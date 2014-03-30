@@ -7,7 +7,7 @@ Vishal Anand
 Travis Purcell
 Ricardo Zavala
 
-File Created by: Travis Purcell, Vishal Anand
+File Created by: Travis Purcell, Vishal Anand, Ricardo Zavala
 
 Purpose: Contains GUI functions
 '''
@@ -23,34 +23,39 @@ import Tkinter, tkFileDialog
 import panels
 import YouTube
 import threading
-#TODO: Merge HW3 into this file or visa versa
 
 #-------------------------------
 #-------- Config Globals -------
 #-------------------------------
 
-#TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
-embedded_video_length = 20;         #Embedded video length is n+1 watch time
+# Define video length, and declare arrays handling video information
+embedded_video_length = 10;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
 
-#Payment - Check HITGeneration.py config global
-
-#TODO: Make assignmentNum 3, but impossible to test alone above 1
+# Because of the way how the validation is implemented, the number of segments (assignments)
+# MUST be 2!  (It was what the team decided during a meeting, anyhow)
 assignmentNum = 2                   #Number of times the videos will be captioned
 validationNum = 1                   #Number of times the Caption HITs will validated
 
 #-------------------------------
-#------- Regular Globals -------
+#---------- Functions ----------
 #-------------------------------
 
-#total_time = 0                         #Duration of embedded video - last segment is just remaining time of original video
-#count = 0                           #number of video segments (aka HITs)
+# Helper function to initialize the accepted_answers array
+def initialize_captions(HIT_IDs):
+    fixed_array = []
+    number_of_hits = len(HIT_IDs)
+    for r in xrange(0, number_of_hits):
+        fixed_array.append([HIT_IDs[r], ""])
+        fixed_array.append([HIT_IDs[r], ""])
+    return fixed_array
 
-
+#-------------------------------
+#----------- Windows -----------
+#-------------------------------
 class FirstWindow(wx.Frame):
-    
     def __init__(self,parent,id,title):
         wx.Frame.__init__(self,parent,wx.ID_ANY,title,size=(400,300))
         self.InitWind()
@@ -59,21 +64,20 @@ class FirstWindow(wx.Frame):
         self.SetBackgroundColour(wx.Colour(191,239,255))
     
     def InitWind(self):
-        
         self.panel1 = panels.FirstPanel(self)
         self.panel2 = panels.SecondPanel(self)
         self.panel2.Hide()
-        
+
         vSizer = wx.BoxSizer(wx.VERTICAL)
         vSizer.Add(self.panel1,1,wx.EXPAND)
         vSizer.Add(self.panel2,1,wx.EXPAND)
         self.SetSizer(vSizer)
-    
+
     def OnClose(self,e):
         dlg = wx.MessageDialog(None,'Are you sure you want to quit?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-    
+
         ret = dlg.ShowModal()
-    
+
         if ret== wx.ID_YES:
             self.Destroy()
         else:
@@ -100,32 +104,36 @@ class FirstWindow(wx.Frame):
             self.panel1.uidInput.Clear()
             self.panel1.pwdInput.Clear()
 
-
     def IncorrectCredentials(self):
         dlg = wx.MessageDialog(None,'Incorrect Credentials. Please try again.','Incorrect Credentials',wx.OK | wx.ICON_ERROR)
-        
+
         ret = dlg.ShowModal()
-        
+
         if ret== wx.OK:
             e.Veto()
 
     def OnCaption(self,e):
         print "caption the video"
+#TODO: Here, code to open up a file can be implemented
+#if loading up a file, first line is the HITTypeId and the following lines are the HITIds
+#creating HIT_IDs would only require each of the HITIds to a string array
+#and skip from here---------------
         url = self.panel2.vidInput.GetValue()
         #url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
         data_title = YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
         count = len(embedded_urls)
         total_time = video_end.pop()
         video_end.append(total_time)
-        HIT_IDs = HITGeneration.GenerateCaptionHIT(self.mtc, count, assignmentNum, embedded_urls)
-        Completed_HITs = []         #Used to link caption and validation HITs
-        Accepted_Answers = []       #Used to build the SRT File
-        
+        HIT_IDs = HITGeneration.GenerateCaptionHIT(self.mtc, count, assignmentNum, embedded_urls, data_title)
+#---------------to here
+        print HIT_IDs
+        Completed_HITs = initialize_captions(HIT_IDs)    #Used to link caption and validation HITs
+        Accepted_Answers = [None]*len(HIT_IDs)           #Used to build the SRT File
+
         dlg = wx.GenericProgressDialog("Progress", "Loading...", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL)
         start(CaptionAndValidate.CaptionAndValidationLoop, dlg,self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
         dlg.ShowModal()
-        #CaptionAndValidate.CaptionAndValidationLoop(self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
-        
+
         print "Completed Hits: "
         print Completed_HITs
         print "Accepted Answers: "
@@ -134,9 +142,9 @@ class FirstWindow(wx.Frame):
 
     def OnReset(self,e):
         dlg = wx.MessageDialog(None,'Are you sure you want to delete all previous HITs?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-        
+
         ret = dlg.ShowModal()
-        
+
         if ret== wx.ID_YES:
             Reset = self.mtc.get_all_hits()
             for hit in Reset:
