@@ -30,7 +30,7 @@ import threading
 
 # Define video length, and declare arrays handling video information
 #TODO: Change to 10
-embedded_video_length = 10;         #Embedded video length is n+1 watch time
+embedded_video_length = 30;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
