@@ -54,9 +54,16 @@ def get_all_reviewable_hits(mtc):
 def find_position(hit_id, completed_hits):
     r = 0
     was_found = False
-    while not was_found:
-        was_found = completed_hits[r] == hit_id
+    can_continue = True
+    while not was_found: 
+        if not can_continue: break
+        current_id = completed_hits[r][0]
+        print hit_id
+        print current_id
+        was_found = hit_id == current_id
         r += 1
+        if r == len(completed_hits):
+            can_continue = False
     if was_found:
         return r
     print "\n---Shouldn't be here!!---\n"
@@ -76,6 +83,7 @@ def check_results(mtc, completed_hits, hit_ids, urls):
     answers = []
     hits_available = get_all_reviewable_hits(mtc)
     for hit in hits_available:
+        mtc.set_reviewing(hit.HITId)
         hit_id = hit.HITId
         assignments = mtc.get_assignments(hit_id)
         temp = []
@@ -100,16 +108,18 @@ def validate(answers, completed_hits, mtc, hit_ids, urls):
         r = 0
         s = 1
         id_r = assignment[r][0]
+        if id_r == "":
+            continue
         if len(assignment) > 2: # There were repeats... Compare 1 and 3
             s += 1
         id_s = assignment[s][0]
         answer1 = assignment[r][1]
         answer2 = assignment[s][1]
         # This should not happen, except after an invalid security answer:
-        t = find_position(completed_hits, id_r)
+        t = find_position(id_r, completed_hits)
         u = t
         if id_r != id_s:
-            u = find_position(completed_hits, id_s)
+            u = find_position(id_s, completed_hits)
         if similar(answer1, answer2, validationHurdle):
             valid_answers.append([u/2, answer1])
         else:
@@ -118,7 +128,13 @@ def validate(answers, completed_hits, mtc, hit_ids, urls):
 
 def merge_answers(captions, accepted_answers):
     for r in captions:
+        print "Captions:"
+        print captions
+        print "Accepted answers before:"
+        print accepted_answers
         accepted_answers[r[0]] = r[1]
+        print "Accepted answers after:"
+        print accepted_answers
     return len(captions)*2
 
 #By FAR the most time consuming function
@@ -129,9 +145,11 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
     while hits_remaining > 0:
         captions = check_results(mtc, Completed_HITs, HIT_IDs, embedded_urls)
         valid_answers = merge_answers(captions, Accepted_Answers)
+        print valid_answers
         if valid_answers > 0:
-            hits_remaining -= len(valid_answers)
+            hits_remaining -= valid_answers
         else:
+            print Accepted_Answers
             time.sleep(30)
     
     #-------------------------------

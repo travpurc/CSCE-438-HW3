@@ -26,7 +26,7 @@ import YouTube
 #-------------------------------
 
 #TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
-embedded_video_length = 20;         #Embedded video length is n+1 watch time
+embedded_video_length = 30;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
