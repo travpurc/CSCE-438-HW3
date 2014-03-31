@@ -30,7 +30,7 @@ import threading
 
 # Define video length, and declare arrays handling video information
 #TODO: Change to 10
-embedded_video_length = 20;         #Embedded video length is n+1 watch time
+embedded_video_length = 10;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
@@ -129,7 +129,7 @@ class FirstWindow(wx.Frame):
 #---------------to here
         print HIT_IDs
         Completed_HITs = initialize_captions(HIT_IDs)    #Used to link caption and validation HITs
-        Accepted_Answers = [None]*len(HIT_IDs)           #Used to build the SRT File
+        Accepted_Answers = [""]*len(HIT_IDs)             #Used to build the SRT File
 
         dlg = wx.GenericProgressDialog("Progress", "Loading...", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL|wx.PD_CAN_ABORT)
         start(CaptionAndValidate.CaptionAndValidationLoop, dlg,self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
