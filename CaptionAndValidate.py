@@ -81,10 +81,13 @@ def check_results(mtc, completed_hits, hit_ids, urls):
         temp = []
         for assignment in assignments:
             for question_form_answer in assignment.answers[0]:
-                if question_form_answer.fields[0] != 1:
-                    hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
-                    temp.append([hit_id, ""])
-                temp.append([hit_id, question_form_answer.fields[1]])
+                for answer in question_form_answer.fields:
+                    print answer
+                    if answer != '1':
+                        hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
+                        temp.append([hit_id, ""])
+                        continue
+                    temp.append([hit_id, answer])
             # End first for
         # End second for
         answers.append(temp)
