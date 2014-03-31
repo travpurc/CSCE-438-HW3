@@ -46,7 +46,7 @@ def get_all_reviewable_hits(mtc):
     pn = 1
     while pn < total_pages:
         pn = pn + 1
-        print "Request hits page %i" % pn
+        #print "Request hits page %i" % pn
         temp_hits = mtc.get_reviewable_hits(page_size=page_size,page_number=pn)
         hits.extend(temp_hits)
     return hits
@@ -55,22 +55,16 @@ def find_position(hit_id, completed_hits):
     r = 0
     was_found = False
     can_continue = True
-    print "Entering Find Loop"
-    while not was_found:
-        print "Inside Find Loop"
+    while not was_found: 
         if not can_continue: break
         current_id = completed_hits[r][0]
-        print "Current ID:"
+        print hit_id
         print current_id
-        if hit_id == "":
-            print "hit_id == '' "
-            was_found = True
-            break
+        was_found = hit_id == current_id
         r += 1
         if r == len(completed_hits):
             can_continue = False
     if was_found:
-        print "was found!"
         return r
     print "\n---Shouldn't be here!!---\n"
     return -1
@@ -95,16 +89,28 @@ def check_results(mtc, completed_hits, hit_ids, urls):
         temp = []
         for assignment in assignments:
             for question_form_answer in assignment.answers[0]:
+                r = 0
                 for answer in question_form_answer.fields:
-                    print answer
-                    if answer != '1':
-                        hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
-                        temp.append([hit_id, ""])
+                    #print answer
+                    if r == 0:
+                        if answer != '1':
+                            print "incorrect security answer"
+                            hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
+                            temp[0] = [hit_id, ""]
+                            r += 2
+                            continue
+                        else:
+                            r += 1
+                    elif r == 1:
+                        temp[0] = [hit_id, answer]
+                    elif r == 2:
                         continue
-                    temp.append([hit_id, answer])
-            # End first for
-        # End second for
-        answers.append(temp)
+                    else:
+                        print "Why am I here?"
+                        continue
+                # End first for
+            answers.append(temp)
+            # End second for
     answers = validate(answers, completed_hits, mtc, hit_ids, urls)
     return answers
 
@@ -114,26 +120,11 @@ def validate(answers, completed_hits, mtc, hit_ids, urls):
         r = 0
         s = 1
         id_r = assignment[r][0]
-        print "id_r:"
-        print id_r
         if id_r == "":
             continue
-        print "Length of assignment:"
-        print len(assignment)
         if len(assignment) > 2: # There were repeats... Compare 1 and 3
             s += 1
-        print "s:"
-        print s
         id_s = assignment[s][0]
-        print "id_s:"
-        print id_s
-
-        if len(assignment) > 2: # There were repeats... Compare 1 and 3
-            s -= 1
-        print "s-1:"
-        print s
-        print "new assignment[s][0]:"
-        print assignment[s][0]
         answer1 = assignment[r][1]
         answer2 = assignment[s][1]
         # This should not happen, except after an invalid security answer:
@@ -141,10 +132,7 @@ def validate(answers, completed_hits, mtc, hit_ids, urls):
         u = t
         if id_r != id_s:
             u = find_position(id_s, completed_hits)
-            print u/2
         if similar(answer1, answer2, validationHurdle):
-            print u
-            print u/2
             valid_answers.append([u/2, answer1])
         else:
             make_validation_hit(mtc, [answer1, answer2], urls[hit_ids.index(id_r)])
