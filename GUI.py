@@ -89,7 +89,7 @@ class FirstWindow(wx.Frame):
         secret_key = self.panel1.pwdInput.GetValue()
         print 'Submit has been clicked. Key is %s' %id
         print 'Password is %s' %secret_key
-         #Call the MTurkConnection function - if valid next screen, else dialoguebox
+        #Call the MTurkConnection function - if valid next screen, else dialoguebox
         HOST = 'mechanicalturk.sandbox.amazonaws.com'
         try:
             self.mtc = MTurkConnection(aws_access_key_id=id, aws_secret_access_key=secret_key,host=HOST)
@@ -142,7 +142,7 @@ class FirstWindow(wx.Frame):
         SRTGenerator.GenerateSRT(data_title, total_time, embedded_video_length, video_start, video_end, Completed_HITs, Accepted_Answers)
 
     def OnReset(self,e):
-        dlg = wx.MessageDialog(None,'Are you sure you want to delete all previous HITs?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None,'Are you sure you want to delete and pay for all previous HITs?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
         ret = dlg.ShowModal()
 
