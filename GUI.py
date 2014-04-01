@@ -115,10 +115,10 @@ class FirstWindow(wx.Frame):
 
     def OnCaption(self,e):
         print "caption the video"
-#TODO: Here, code to open up a file can be implemented
-#if loading up a file, first line is the HITTypeId and the following lines are the HITIds
-#creating HIT_IDs would only require each of the HITIds to a string array
-#and skip from here---------------
+        #TODO: Here, code to open up a file can be implemented
+        #if loading up a file, first line is the HITTypeId and the following lines are the HITIds
+        #creating HIT_IDs would only require each of the HITIds to a string array
+        #and skip from here---------------
         url = self.panel2.vidInput.GetValue()
         #url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
         data_title = YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
