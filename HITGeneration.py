@@ -51,7 +51,7 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls, data_title):
     HIT_IDs = []
     HIT_Type_IDs = []
     for i in range(0, n):
-        title = 'Provide a caption of a following video'
+        title = '(Fast, Entertaining) Provide a caption of a 5 second video segment'
         description = ('Watch a short video and type in a transcription'
                         ' of it')
         keywords = 'video, captioning, short'

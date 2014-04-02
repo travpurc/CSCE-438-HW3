@@ -13,9 +13,10 @@ Purpose: Contains SRT caption file generation functions
 
 '''
 
-def GenerateSRT(title, duration, segment_length, video_start, video_end, Completed_HITs, Accepted_Answers):
+def GenerateSRT(directory, title, duration, segment_length, video_start, video_end, Completed_HITs, Accepted_Answers):
     print "Generating SRT Caption File"
-    SRTFile = open(title+".srt", 'w')
+    print directory
+    SRTFile = open(directory+"\\"+title+".srt", 'w')
     captions = SortResults(Completed_HITs, Accepted_Answers)
     for i, caption in enumerate(captions):
         SRTFile.write(str(i+1)+"\n")
