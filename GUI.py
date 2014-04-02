@@ -120,6 +120,7 @@ class FirstWindow(wx.Frame):
         #creating HIT_IDs would only require each of the HITIds to a string array
         #and skip from here---------------
         url = self.panel2.vidInput.GetValue()
+        directory = self.panel2.dirInput.GetValue()
         #url = "http://www.youtube.com/watch?v=KaqC5FnvAEc"
         data_title = YouTube.GetYouTubeData(url, embedded_video_length, embedded_urls, video_start, video_end)
         count = len(embedded_urls)
@@ -139,7 +140,7 @@ class FirstWindow(wx.Frame):
         print Completed_HITs
         print "Accepted Answers: "
         print Accepted_Answers
-        SRTGenerator.GenerateSRT(data_title, total_time, embedded_video_length, video_start, video_end, Completed_HITs, Accepted_Answers)
+        SRTGenerator.GenerateSRT(directory, data_title, total_time, embedded_video_length, video_start, video_end, Completed_HITs, Accepted_Answers)
 
     def OnReset(self,e):
         dlg = wx.MessageDialog(None,'Are you sure you want to delete and pay for all previous HITs?','Question',wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
