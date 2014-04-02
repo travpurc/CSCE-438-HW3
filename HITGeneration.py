@@ -22,7 +22,7 @@ import os
 
 #Total Price  = ((Caption_Price * assignmentNum) + Validation_Price)(video segments) + Tax
 #Choose Wisely...
-Caption_Price = 0.01
+Caption_Price = 0.05
 Validation_Price = 0.01
 
 #-------------------------------

@@ -78,8 +78,6 @@ def find_position(hit_id, completed_hits):
         print "Current ID:"
         print current_id
         if hit_id == "":
-            print "hit_id == '' "
-            #was_found = True
             break
         if hit_id == current_id:
             print "position in Completed_Hits found: %i" % index
@@ -101,96 +99,7 @@ def similar(string1, string2, hurdle):
 def make_validation_hit(mtc, options, url):
     return HITGeneration.GenerateValidationHIT(mtc, options, url)
 
-# answers is a list in the format [ [ [hit_id, answer], [hit_id, answer] ], ... ].
-# It contains all "answers" from a single HIT in a list of lists of (HIT_ID, answer)
-def validate(hit_answers, completed_hits, mtc, hit_ids, urls):
-    valid_answers = []
-    print "Validate() - hit_answers: "
-    print hit_answers
-    print "Validate() - completed_hits: "
-    print completed_hits
-    for hit_group in hit_answers:
-        #[ [hit_id, answer], [hit_id, answer] ]
-        print "hit_group:"
-        print hit_group
-        assignment1 = 0
-        assignment2 = 1
-        # HIT_ID for assignment1
-        id_r = hit_group[assignment1][0]
-        print "id_r:"
-        print id_r
-        # TODO: SHOULD NOT GET HERE!
-        if id_r == "":
-            continue
-        print "Length of HIT group:"
-        print len(hit_group)
-        if len(hit_group) > 2:                  # There are more than 2 assignments... Compare 1 and 3
-            assignment2 = len(hit_group)/2
-        print "assignment2:"
-        print assignment2
-        # HIT_ID for assignment2
-        id_s = hit_group[assignment2][0]
-        print "id_s:"
-        print id_s
-        caption1 = hit_group[assignment1][1]
-        caption2 = hit_group[assignment2][1]
-        index_caption1 = find_position(id_r, completed_hits)
-        index_caption2 = index_caption1 + 1
-        # This should not happen, except after an invalid security answer:
-        if id_r != id_s:
-            index_caption2 = find_position(id_s, completed_hits)
-            #print u/2
-        print index_caption1
-        print index_caption2
-        if similar(caption1, caption2, validationHurdle):
-            print index_caption2
-            print index_caption2/2
-            valid_answers.append([index_caption2/2, caption1])
-        else:
-            make_validation_hit(mtc, [caption1, caption2], urls[hit_ids.index(id_r)])
-    return valid_answers
-'''
-def validate(hit_answers, completed_hits, mtc, hit_ids, urls):
-    valid_answers = []
-    for hit_group in hit_answers:
-        assignment1 = 0
-        assignment2 = 1
-        # HIT_ID for assignment1
-        id_r = hit_group[assignment1][0]
-        print "id_r:"
-        print id_r
-        # TODO: SHOULD NOT GET HERE!
-        if id_r == "":
-            continue
-        print "Length of HIT group:"
-        print len(hit_group)
-        if len(hit_group) > 2:                  # There are more than 2 assignments... Compare 1 and 3
-            assignment2 = len(hit_group)/2
-        print "assignment2:"
-        print assignment2
-        # HIT_ID for assignment2
-        id_s = hit_group[assignment2][0]
-        print "id_s:"
-        print id_s
-        caption1 = hit_group[assignment1][1]
-        caption2 = hit_group[assignment2][1]
-        index_caption1 = find_position(id_r, completed_hits)
-        index_caption2 = index_caption1 + 1
-        # This should not happen, except after an invalid security answer:
-        if id_r != id_s:
-            index_caption2 = find_position(id_s, completed_hits)
-            #print u/2
-        print index_caption1
-        print index_caption2
-        if similar(caption1, caption2, validationHurdle):
-            print index_caption2
-            print index_caption2/2
-            valid_answers.append([index_caption2/2, caption1])
-        else:
-            make_validation_hit(mtc, [caption1, caption2], urls[hit_ids.index(id_r)])
-    return valid_answers
-'''
-def check_results(mtc, completed_hits, hit_ids, urls):
+def check_results(mtc, dlg, completed_hits, hit_ids, urls):
     answers = []
     hits_available = get_all_reviewable_hits(mtc)
     for hit in hits_available:
@@ -214,17 +123,9 @@ def check_results(mtc, completed_hits, hit_ids, urls):
                         r += 1
                     # Caption!
                     elif r == 1:
-                        temp.append([hit_id, answer])
-                        #temp.append(answer)
-                # End first for
-            # End second for
-        answers.append(temp)
-    print "answers (before validate):"
-    print answers
-    valid_answers = validate(answers, completed_hits, mtc, hit_ids, urls)
-    print "answers (after validate)"
-    print valid_answers
-    return valid_answers
+                       answers.append((hit_id, answer))
+                       wx.CallAfter(dlg.Update,1,"Loading...")
+    return answers
 
 #By FAR the most time consuming function
 #Returns a list of validated answers
@@ -233,14 +134,17 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
     total_hits = count*assignmentNum
     remaining_hits = total_hits
     while remaining_hits > 0:
-        captions = check_results(mtc, Completed_HITs, HIT_IDs, embedded_urls)
-        valid_answers = merge_answers(captions, Accepted_Answers)
-        print valid_answers
-        if valid_answers > 0:
-            remaining_hits -= valid_answers
+        captions = check_results(mtc, dlg, Completed_HITs, HIT_IDs, embedded_urls)
+        #valid_answers = merge_answers(captions, Accepted_Answers)
+        #print valid_answers
+        if len(captions) > 0:
+            for caption in captions:
+                Accepted_Answers.append(caption)
+            remaining_hits -= len(captions)
         else:
             print Accepted_Answers
             time.sleep(30)
+    wx.CallAfter(dlg.Destroy)
 
 '''
 def check_results(mtc, completed_hits, hit_ids, urls):

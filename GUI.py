@@ -37,7 +37,7 @@ embedded_urls = []
 
 # Because of the way how the validation is implemented, the number of segments (assignments)
 # MUST be 2!  (It was what the team decided during a meeting, anyhow)
-assignmentNum = 2                   #Number of times the videos will be captioned
+assignmentNum = 1                   #Number of times the videos will be captioned
 validationNum = 1                   #Number of times the Caption HITs will validated
 
 #-------------------------------
@@ -129,7 +129,7 @@ class FirstWindow(wx.Frame):
 #---------------to here
         print HIT_IDs
         Completed_HITs = initialize_captions(HIT_IDs)    #Used to link caption and validation HITs
-        Accepted_Answers = [""]*len(HIT_IDs)             #Used to build the SRT File
+        Accepted_Answers = []                            #Used to build the SRT File
 
         dlg = wx.GenericProgressDialog("Progress", "Loading...", maximum=count, parent=None, style=wx.PD_AUTO_HIDE|wx.PD_APP_MODAL|wx.PD_CAN_ABORT)
         start(CaptionAndValidate.CaptionAndValidationLoop, dlg,self.mtc, HIT_IDs, count, assignmentNum, embedded_urls, Completed_HITs, Accepted_Answers)
