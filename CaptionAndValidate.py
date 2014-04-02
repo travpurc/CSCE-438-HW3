@@ -113,13 +113,6 @@ def check_results(mtc, dlg, completed_hits, hit_ids, urls):
                 for answer in question_form_answer.fields:
                     # Answer to the security question:
                     if r == 0:
-                        # If answer != 1, generate new hit, append the new HIT_ID to the answers to validate...
-                        if answer != '1':
-                            hit_id = make_direct_validation_hit(hit_id, completed_hits, urls)
-                            temp.append([hit_id, ""])
-                            # ... and skip the next answer (caption)
-                            r += 2
-                            continue
                         r += 1
                     # Caption!
                     elif r == 1:
@@ -140,6 +133,8 @@ def CaptionAndValidationLoop(dlg, mtc, HIT_IDs, count, assignmentNum, embedded_u
         if len(captions) > 0:
             for caption in captions:
                 Accepted_Answers.append(caption)
+                if len(Accepted_Answers) == count: 
+                    break
             remaining_hits -= len(captions)
         else:
             print Accepted_Answers
