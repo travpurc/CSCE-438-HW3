@@ -1,0 +1,224 @@
+1
+00:00:00,000 --> 00:00:09,000
+In this video, I want to give you the basics of trigonometry.  Trigonometry.  It sounds like a very complicated topic but
+
+2
+00:00:10,000 --> 00:00:19,000
+just the study of the ratios of sides of triangles. The trig part of trigonometry literally means triangle and the
+
+3
+00:00:20,000 --> 00:00:29,000
+ometry means measure.  So let me just give you some examples here, and I think it will make everything pretty clear.  So let me draw some right triangles, let me draw one right triangle
+
+4
+00:00:30,000 --> 00:00:39,000
+Is a right triangle. And when I say it's a right triangle, it's because one of the angles here is ninety degrees. This right here is a right...
+
+5
+00:00:40,000 --> 00:00:49,000
+That right there is a right angle. It is equal to ninety -it is equal to ninety degrees. And we'll talk about other ways...
+
+6
+00:00:50,000 --> 00:00:59,000
+The the magnitude of angles in future videos. So we have a 90 degree angle its a right triangle, let me put some lengths to the sides here. So this side over here is
+
+7
+00:01:00,000 --> 00:01:09,000
+This height right over there is three. Maybe the base of the triangle right over here is four and then the hypotenuse of
+
+8
+00:01:10,000 --> 00:01:19,000
+hypotenuse of the triangle over here is five. You only have a hypotenuse when you have a right triangle. It is the side opposite
+
+9
+00:01:20,000 --> 00:01:29,000
+and it is the longest side of a right triangle. So that right there is the hypotenuse. Hypotenuse. You probably already learned that from geometry.
+
+10
+00:01:30,000 --> 00:01:39,000
+We can verify that this right triangle sides work out. We know from the Pythagorean Theorem that three squared plus, four squared, plus...
+
+11
+00:01:40,000 --> 00:01:49,000
+Has got to be equal to the length of the longest side, the length of the hypotenuse square is equal to five squares so you can verify that this works out
+
+12
+00:01:50,000 --> 00:01:59,000
+Pythagorean Theorem.  Now with that out of the way let's learn a little bit of trigonomety.  Now the core, core funtions of trigonometry, we're going to learn a little more
+
+13
+00:02:00,000 --> 00:02:09,000
+fucntions mean there is the sign, the sign fucntion. There is the co-sign function. And there, they, there is the
+
+14
+00:02:10,000 --> 00:02:19,000
+and you write sin cos or s-i-n, c-o-s, and tan for short. And these really just specify for any angle in this
+
+15
+00:02:20,000 --> 00:02:29,000
+Itll specify the ratios of certain sides. SO let me just write something out. This is a little bit of a mnemonic here. So something just to help you remember the definitions of
+
+16
+00:02:30,000 --> 00:02:39,000
+But I'm gonna write down something, it's called soh, soh cah, soh cah toa. soh cah
+
+17
+00:02:40,000 --> 00:02:49,000
+Is how far this pneumonic will take you in trigonometry.  So we have SoCaToa.  So SO tell us that sine...
+
+18
+00:02:50,000 --> 00:02:59,000
+Is equal to opposite over hypotenuse.  Opposite over hypotenuse.  Opposite over hypotenuse.  It's telling us
+
+19
+00:03:00,000 --> 00:03:09,000
+A lot of sense just yet, Ill, Ill give, do it a little bit more detailed in a second and then co-sign is equal to adjacent over hypotenuse
+
+20
+00:03:10,000 --> 00:03:19,000
+Equal to adjacent over hypotenuse. And then you finally have tangent -you have tangent. Tangent is equal to...
+
+21
+00:03:20,000 --> 00:03:29,000
+Adjacent.  Opposite over adjacent. so you're probably saying, "Hey, Sal, what is all this opposite, hypotenuse, adjacent? What are we talking about?" Well, let's take an angle here...
+
+22
+00:03:30,000 --> 00:03:39,000
+Lets say that this angle right over here, this angle right here is theta between the side of length four and the side of length five. This angle right here is theta.
+
+23
+00:03:40,000 --> 00:03:49,000
+out what the sign of theta, the cosign of theta, and what the tangent of theta are.  So if we want to first focus on the sign of theta.
+
+24
+00:03:50,000 --> 00:03:59,000
+theta we just have to remember soh cah toa. Soh cah toa. Sign is opposite over hypotenuse so sin a theta is equal to 
+
+25
+00:04:00,000 --> 00:04:09,000
+So what's the opposite side to the angle? So this is our angle right here. The opposite side -the opposite side. If you just go to the opposite side. So...
+
+26
+00:04:10,000 --> 00:04:19,000
+that are kind of adjacent to the angle the opposite side is the three it's just kind of opening on to the three so the opposite side is three
+
+27
+00:04:20,000 --> 00:04:29,000
+Hypotenuse.  The hypotenuse.  Well we all ready know the hypotenuse here is five.  So it's three; three over five.  So the sign of theta is three-fifths.
+
+28
+00:04:30,000 --> 00:04:39,000
+that is three fifths and I'm going to show you in a second that if this angle is a certain angle it is always going to be three fifths, the ratio
+
+29
+00:04:40,000 --> 00:04:49,000
+The hypotenuse is always going to be the same even if the actual triangle were a larger triangle or a smaller one. So Ill show you that in a second but lets go through all of the trig functions.
+
+30
+00:04:50,000 --> 00:04:59,000
+let's this about the cosine. Cosine is adjacent over hypotenuse
+
+31
+00:05:00,000 --> 00:05:09,000
+We all ready figured out that the three was the opposite side, this is the opposite side.  And only when we're talking about this angle, when you talk about this angle, this side is opposite to it.
+
+32
+00:05:10,000 --> 00:05:19,000
+This angle, this four side is adjacent to it.  It's one of the an.., it's one of the sides that kind of make up, that kind of form the vertex here.
+
+33
+00:05:20,000 --> 00:05:29,000
+Is an adjacent side.  Adjacent.  And I want to be very clear this only applies to this angle.  If we were talking about that angle then this green side would be
+
+34
+00:05:30,000 --> 00:05:39,000
+The yellow side would be adjacent, but we're just focusing on this angle right here.  So cosign of this angle. Well we hear about adjacent; well the adjacent side to this angle is...
+
+35
+00:05:40,000 --> 00:05:49,000
+So it is adjacent over the hypotenuse. It's the adjacent, which is four, over the hypotenuse.  Four over
+
+36
+00:05:50,000 --> 00:05:59,000
+Over five.  Now let's do the tangent.  Let's do the tangent.  The tangent of theta.  Opposite over adjacent
+
+37
+00:06:00,000 --> 00:06:09,000
+opposite side is three, the oppsoite side is three.  What is the adjacent side? Well, we all ready figured that out, the adjacent side is four.
+
+38
+00:06:10,000 --> 00:06:19,000
+the sides of this right triangle we were able to figre out the major trig ratios. And we'll see there's, there are other trig ratios but there can all be derived from these 
+
+39
+00:06:20,000 --> 00:06:29,000
+The basic trig funtions.  Now let's think about another angle in this triangle, and I'll redraw it because my triangle is starting to get a little messy.  So let's re
+
+40
+00:06:30,000 --> 00:06:39,000
+Same triangle.  The exact same triangle.  And once again the lengths of this triangle are; we have a length of four there.
+
+41
+00:06:40,000 --> 00:06:49,000
+length three there, and we have length five there.  The last example we just used this theta.  But let's do another angle.
+
+42
+00:06:50,000 --> 00:06:59,000
+angle up here. Lets do another angle up here and lets call this angle, I dont know, Ill think of something, a random greek letter, so lets say its xi
+
+43
+00:07:00,000 --> 00:07:09,000
+So a little bizarre.  Theta is what you normally use, but since I all ready used theta, let's use zi.  Or actually even instead of zi let me just simplfy it.  Let me just cal this angle x.  Let's call 
+
+44
+00:07:10,000 --> 00:07:19,000
+So lets figure out the trig functions for that angle X. So we have sin of X is going to be equal to what? Well sin is
+
+45
+00:07:20,000 --> 00:07:29,000
+So what side is opposite to X? Well, it opens onto this four. It opens onto the four. So in this context this is now the opposite.
+
+46
+00:07:30,000 --> 00:07:39,000
+This is now the opposite side. Remember four was adjacent to this theta but its opposite to X so its going to be four
+
+47
+00:07:40,000 --> 00:07:49,000
+The hypotenuse, well the hypotenuse is going to be the same regardless of which angle you pick.  So the hypotenuse is now going to be five, so it's four-fifths.
+
+48
+00:07:50,000 --> 00:07:59,000
+What is the cosine -what is the cosine of X? So, cosine is adjacent over hypotenuse. What side is adjacent to X?
+
+49
+00:08:00,000 --> 00:08:09,000
+hypotenuse. You have the hypotenuse here well the three side, it forms, its one of the sides that forms the vertex that X is at and its not the hypotenuse so this is the adjacent
+
+50
+00:08:10,000 --> 00:08:19,000
+That is adjacent so it is equal to three over the hypotenuse, the hypotenuse is five.  And then finally, the tangent
+
+51
+00:08:20,000 --> 00:08:29,000
+Want to figure out the tangent of x.  Tangent is opposite over adjacent.  Soh Cah Toa.  Tangent is opposite over adjcent.  Opposite over adjacent.
+
+52
+00:08:30,000 --> 00:08:39,000
+side is four the I want to do it in that blue color. The opposite side is four and the adjacent side
+
+53
+00:08:40,000 --> 00:08:49,000
+Adjacent side is three.  And we're done.  In the next video, I'll do a ton of more examples of this, just so that we get a feel for it.  But I'll leave you thinking
+
+54
+00:08:50,000 --> 00:08:59,000
+Is when these angles start to approach ninety degrees, or how could they even get larger than ninety degrees. And what we're going to see is that this definition, the SoCaToa definition takes us a long way
+
+55
+00:09:00,000 --> 00:09:09,000
+Between zero and ninty degrees, or that are less than ninety degrees. But they kind of really start to mess up at the boundaries. So we're going to introduce a new definition that's kind of 
+
+56
+00:09:10,000 --> 00:09:17,000
+Cah toa definition for finding the sign, co-sign and tangent of really any angle
+
