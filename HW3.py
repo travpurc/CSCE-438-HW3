@@ -26,7 +26,7 @@ import YouTube
 #-------------------------------
 
 #TODO Evaluated video length (20 seconds is too long, 5-10 seconds maybe)
-embedded_video_length = 30;         #Embedded video length is n+1 watch time
+embedded_video_length = 10;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
@@ -73,7 +73,7 @@ video_end.append(total_time)
 ACCESS_ID = raw_input("ACCESS_ID: ")
 SECRET_KEY = raw_input("SECRET_KEY: ");
 #TODO: Change from sandbox when live
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
+HOST = 'mechanicalturk.amazonaws.com'
 
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,

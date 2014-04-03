@@ -30,7 +30,7 @@ import threading
 
 # Define video length, and declare arrays handling video information
 #TODO: Change to 10
-embedded_video_length = 5;         #Embedded video length is n+1 watch time
+embedded_video_length = 10;         #Embedded video length is n+1 watch time
 video_start = []                    #Arrays of the sequential start and end times
 video_end = []
 embedded_urls = []
@@ -90,7 +90,7 @@ class FirstWindow(wx.Frame):
         print 'Submit has been clicked. Key is %s' %id
         print 'Password is %s' %secret_key
         #Call the MTurkConnection function - if valid next screen, else dialoguebox
-        HOST = 'mechanicalturk.sandbox.amazonaws.com'
+        HOST = 'mechanicalturk.amazonaws.com'
         try:
             self.mtc = MTurkConnection(aws_access_key_id=id, aws_secret_access_key=secret_key,host=HOST)
             #Display balance for user

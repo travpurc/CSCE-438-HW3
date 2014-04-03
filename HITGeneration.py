@@ -22,7 +22,7 @@ import os
 
 #Total Price  = ((Caption_Price * assignmentNum) + Validation_Price)(video segments) + Tax
 #Choose Wisely...
-Caption_Price = 0.05
+Caption_Price = 0.1
 Validation_Price = 0.01
 
 #-------------------------------
@@ -51,8 +51,8 @@ def GenerateCaptionHIT(mtc, n, assignmentNum, embedded_urls, data_title):
     HIT_IDs = []
     HIT_Type_IDs = []
     for i in range(0, n):
-        title = '(Fast, Entertaining) Provide a caption of a 5 second video segment'
-        description = ('Watch a short video and type in a transcription'
+        title = 'Provide a caption of a short video segment - Fast, Entertaining, and Educational'
+        description = ('Watch a short video segment and type in a transcription'
                         ' of it')
         keywords = 'video, captioning, short'
         ratings =[('Long (&gt;1 min)','-2'),
