@@ -13,15 +13,22 @@ Purpose: Contains SRT caption file generation functions
 
 '''
 
+def stripped(x):
+	return "".join([i for i in x if 31 < ord(i) < 127])
+
+
 def GenerateSRT(directory, title, duration, segment_length, video_start, video_end, Completed_HITs, Accepted_Answers):
     print "Generating SRT Caption File"
     print directory
-    SRTFile = open(directory+"\\"+title+".srt", 'w')
+    if directory != "" or directory != None:
+        SRTFile = open(title+".srt", 'w')
+    else:
+        SRTFile = open(directory+"\\"+title+".srt", 'w')
     captions = SortResults(Completed_HITs, Accepted_Answers)
     for i, caption in enumerate(captions):
         SRTFile.write(str(i+1)+"\n")
         SRTFile.write(ConvertSecondsToSRT(video_start[i])+" --> "+ConvertSecondsToSRT(video_end[i])+"\n")
-        SRTFile.write(caption+"\n")
+        SRTFile.write(stripped(caption)+"\n")
         SRTFile.write("\n")
 
     SRTFile.close()

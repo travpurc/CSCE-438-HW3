@@ -71,9 +71,9 @@ video_end.append(total_time)
 #-------------------------------
 
 ACCESS_ID = raw_input("ACCESS_ID: ")
-SECRET_KEY = raw_input("SECRET_KEY: ");
+SECRET_KEY = raw_input("SECRET_KEY: "); 
 #TODO: Change from sandbox when live
-HOST = 'mechanicalturk.amazonaws.com'
+HOST = 'mechanicalturk.sandbox.amazonaws.com'
 
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
